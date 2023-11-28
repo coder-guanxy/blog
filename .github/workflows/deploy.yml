@@ -44,18 +44,13 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Install dependencies
+        run: npm i pnpm -g
         run: pnpm install # or pnpm install / yarn install / bun install
       - name: Build with VitePress
-        run: pnpm docs:build
+        run: |
+        pnpm docs:build
           # npm run docs:build # or pnpm docs:build / yarn docs:build / bun run docs:build
-          touch docs/.vitepress/dist/.nojekyll
-
-      - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@v1
-        with:
-          source: docs/.vitepress/dist
-          destination: docs/.vitepress/dist
-          
+        touch docs/.vitepress/dist/.nojekyll
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
