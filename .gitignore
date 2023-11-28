@@ -4,6 +4,7 @@
 /build
 /yahaodai
 /docs/.vitepress/cache
+/docs/.vitepress/dist
 *.7z
 
 
