@@ -1,0 +1,6 @@
+---
+title: redux
+outlineTitle:
+---
+
+### redux
