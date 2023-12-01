@@ -12,7 +12,7 @@ module.exports = {
   themeConfig: {
     // logo: '/favicon.ico',
     outline: {
-      level: 1,
+      level: 2,
       label: 'GUANの博客'
     },
     // aside: 'left',
@@ -33,7 +33,7 @@ module.exports = {
       '/vitepress-blog/': generateSidebarBlogConfig()
     },
     editLink: {
-      pattern: 'https://github.com/coder-guanxy/blog/tree/main/docs/:path',
+      pattern: 'https://github.com/coder-guanxy/blog/tree/main/src/:path',
       text: '编辑此页'
     }
   }

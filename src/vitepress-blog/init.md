@@ -71,4 +71,55 @@ npx vitepressinit
 
 ## 快速创建过程中配置
 
+上述步骤完成之后得到下面的目录结构：
+
+```
+.
+├─ docs
+│  ├─ .vitepress
+│  │  └─ config.js // 配置文件
+│  ├─ api-examples.md // api-examples 路由下的内容
+│  ├─ markdown-examples.md // markdown-examples 路由下的内容
+│  └─ index.md // 首页内容
+└─ package.json
+
+```
+
+配置文件加命名（默认 docs）：
+
+```
+◇  Where should VitePress initialize the config?
+│  ./docs
+```
+
+网站的 title：
+更改 `docs/.vitepress/config.js` 文件下面的 `title` 属性
+
+```
+◇ Site title:
+│ My Awesome Project
+```
+
+网站描述：
+更改 `docs/.vitepress/config.js` 文件下面的 `description` 属性
+
+```
+◇ Site description:
+│ A VitePress Site
+```
+
+选择主题：
+
+```
+◆ Theme:
+│ ● Default Theme (Out of the box, good-looking docs)
+│ ○ Default Theme + Customization
+│ ○ Custom Theme
+```
+
+<!-- <script setup>
+    const data = useData()
+    console.log('data: ', data);
+</script> -->
+
 也可直接参照官网的[快速开始](https://vitepress.dev/guide/getting-started)
