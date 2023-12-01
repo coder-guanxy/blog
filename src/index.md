@@ -1,6 +1,6 @@
 ---
 editLink: false
-outline: { label: 1 }
+outline: { label: '123' }
 ---
 
 #### 遇到的问题

@@ -50,11 +50,11 @@ jobs:
       - name: Build with VitePress
         run: pnpm docs:build
       - name: create .nojekyll file
-        run: touch docs/.vitepress/dist/.nojekyll
+        run: touch dist/.nojekyll
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: docs/.vitepress/dist
+          path: dist
 
   # Deployment job
   deploy:
