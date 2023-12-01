@@ -14,83 +14,76 @@ outline: { label: '123' }
    - public -config
 3. 部署问题
    - 更改 pnpm 安装
+4. 怎么使 vue 插入到 md 中
+5. 怎么更改 layout -
+6. 在更改 缓存文件位置之后，再次更改配置文件，需要重新启动才能正常展示，否则为空白页面，初步怀疑是缓存文件没有删除
 
-## 如何使用 vitepress 搭建博客
+## 快速搭建 Blog
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+安装 vitepress 的先决条件：
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+- Node.js 版本要高于 18
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+第一步：选择一个你中的开发目录然后创建一个文件夹 `learnBlog` 并进入到该文件夹中
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+```bash
+ mkdir learnBlog && cd learnBlog
+```
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+第二步：生成 package.json 文件
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+```bash
+npm init -y
+```
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+第三步：安装 vitepress 依赖
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+```bash
+npm install vitepress -D
+```
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+第四步：使用 npx 创建 vitepress 目录
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+```bash
+npx vitepress init
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+```
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+执行上面的命令之后会在在 Terminal 中询问：
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+1. 在哪里初始化配置
+2. 网站标题
+3. 网站描述
+4. 最后选择主题
+   - 默认主题
+   - 默认主题 + 自定义
+   - 自定义主题
+5. 配置文件和主题文件是否使用 Typescript
+6. 是否`vitepress npm script`添加到 package.json 中
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+["初始化图片"](./init.jpg)
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+也可以合并所有的命令
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+```bash
+ mkdir learnBlog && cd learnBlog && npm init -y && npm install vitepress -D && npx vitepress init
+```
 
-### 客何使用 vitepress 搭建博客
+第五步：最后执行 `npm run docs:dev`
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+第六步：在浏览器中打开这个地址`http://localhost:5174/`
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+此时已经成功构建一个简单的 Blog
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+当选择之后
+我这里直接使用了默认主题 + 自定义
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+也可直接参照官网的[快速开始](https://vitepress.dev/guide/getting-started)
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+## 根据
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+## 简单介绍常用的几个 vitepress 配置
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+```
 
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
-
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
-
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
-
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
-
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
-
-## tepress 搭建博
-
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
-
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
-
-tepress 搭建博 tepress 搭建博 tepress 搭建博 tepress 搭建博 tepress 搭建博 tepress 搭建博
-
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
-
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
-
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
-
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
-
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
-
-何使用 vitepress 搭建博客何使用 vitepress 搭建博客
+```

@@ -3,8 +3,8 @@ module.exports = {
   description: 'vitepress & guan blog & GUANの博客',
   lang: 'zh-CN',
   base: '/blog/',
-  outDir: '../dist',
-  cacheDir: '../_cache',
+  outDir: '../dist/',
+  cacheDir: '../_cache/',
   srcDir: '../src',
   titleTemplate: ':title | GUANの博客',
   head: [['link', { rel: 'ico', type: 'image/ico', href: '/favicon.ico' }]],
@@ -24,12 +24,13 @@ module.exports = {
       }
     },
     docFooter: {
-      prev: 'Pagina prior',
-      next: 'Proxima pagina'
+      prev: '上一页',
+      next: '下一页'
     },
     nav: navConfig(),
     sidebar: {
-      '/react/source': sidebarConfig()
+      '/react/source': sidebarConfig(),
+      '/vitepress-blog/': generateSidebarBlogConfig()
     },
     editLink: {
       pattern: 'https://github.com/coder-guanxy/blog/tree/main/docs/:path',
@@ -37,6 +38,15 @@ module.exports = {
     }
   }
 };
+
+function generateSidebarBlogConfig() {
+  return [
+    {
+      // text: '初始化',
+      items: [{ text: '初始化', link: '/vitepress-blog/init' }]
+    }
+  ];
+}
 
 // sidebar 配置
 function sidebarConfig() {
@@ -55,6 +65,7 @@ function sidebarConfig() {
 function navConfig() {
   return [
     { text: '导航', link: '/' },
+    { text: '搭建博客', link: '/vitepress-blog/init' },
     {
       text: 'React',
       items: [
