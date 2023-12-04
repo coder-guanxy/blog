@@ -14,7 +14,7 @@ title 的配置有两种：一种是直接配置 title, 另一种是配置 title
 
 直接配置 title
 
-```js
+```js{3}
 export default defineConfig({
   //...
   title: 'learn blog'

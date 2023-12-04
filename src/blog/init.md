@@ -65,7 +65,7 @@ npx vitepressinit
 5. 配置文件和主题文件是否使用 Typescript
 6. 是否 `vitepress npm script`添加到 package.json 中
 
-![初始化](init/init.jpg 'vitepress 初始化')
+![初始化](../public/blog/init/init.jpg 'vitepress 初始化')
 
 第五步：最后执行 `npm run docs:dev`
 
@@ -97,10 +97,10 @@ npx vitepressinit
 ```
 
 文件夹名字的更改：
-![文件夹配置](init/config-dir.jpg)
+![文件夹配置](../public/blog/init/config-dir.jpg)
 
 `package.json` 中的 `scripts` 字段的更改：
-![文件夹配置](init/config-package.jpg)
+![文件夹配置](../public/blog/init/config-package-scripts.jpg)
 
 网站的 title：
 更改 `docs/.vitepress/config.js` 文件下面的 `title` 属性
@@ -120,12 +120,12 @@ npx vitepressinit
 
 上面的两个配置的是配置文件中网站的 title - description
 
-![项目中文件的位置](init/config-file.jpg)
+![项目中文件的位置](../public/blog/init/config-file.jpg)
 
-![文件中的标题和描述](init/config-title-description.jpg)
+![文件中的标题和描述](../public/blog/init/config-title-description.jpg)
 
 title 是指网站在浏览器 tab 页上面显示的文字
-![tab上展示的title](init/browswe-tab-title.jpg)
+![tab上展示的title](../public/blog/init/browswe-tab-title.jpg)
 
 选择主题：
 
@@ -137,7 +137,7 @@ title 是指网站在浏览器 tab 页上面显示的文字
 ```
 
 这里选中的时默认主题 + 自定义主题
-![默认+自定义主题](init/config-theme.jpg)
+![默认+自定义主题](../public/blog/init/config-theme.jpg)
 
 如果是默认主题则没有 theme 文件夹
 如果是自定义主题则没有 config 文件
