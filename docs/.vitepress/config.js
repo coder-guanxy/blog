@@ -11,6 +11,7 @@ module.exports = {
   // stable difussion
   themeConfig: {
     // logo: '/favicon.ico',
+    returnToTopLabel: '至顶',
     outline: {
       level: 2,
       label: 'GUANの博客'
@@ -42,8 +43,11 @@ module.exports = {
 function generateSidebarBlogConfig() {
   return [
     {
-      // text: '初始化',
-      items: [{ text: '初始化', link: '/vitepress-blog/init' }]
+      text: '快速开始',
+      items: [
+        { text: '初始化', link: '/vitepress-blog/init' },
+        { text: '配置简介', link: '/vitepress-blog/config' }
+      ]
     }
   ];
 }
