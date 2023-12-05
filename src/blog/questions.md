@@ -14,14 +14,16 @@
 
 相对引入 `![main](../public/blog/main.jpg)`
 
-### 2. 更改 port
+### 问题描述
 
-package.json
+更改端口号
 
-```json{2}
-"scripts": {
-    "docs:dev": "vitepress dev config --port 3006",
+### 解决方案：
+
+```json{3}
+{
+    "scripts": {
+         "docs:dev": "vitepress dev config --port 3006",
+    }
 }
 ```
-
-### 3. 创建时间和更新时间
