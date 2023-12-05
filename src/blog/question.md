@@ -13,3 +13,17 @@
 ### 解决方法
 
 相对引入 `![main](../public/blog/main.jpg)`
+
+### 问题描述
+
+更改端口号
+
+### 解决方案：
+
+```json{3}
+{
+    "scripts": {
+         "docs:dev": "vitepress dev config --port 3006",
+    }
+}
+```
