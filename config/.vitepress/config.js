@@ -9,9 +9,12 @@ module.exports = {
   titleTemplate: ':title | GUANの博客',
   head: [['link', { rel: 'ico', type: 'image/ico', href: '/favicon.ico' }]],
   vite: {
+    define: {
+      _APP_VERSION__: JSON.stringify('v1.0.0'),
+    }
     // publicDir: '../public'
     // build: {
-    //   assetsDir: './src/public'
+    //   assetsDir: '../public'
     // }
   },
   // stable difussion
@@ -19,7 +22,7 @@ module.exports = {
     // logo: '/favicon.ico',
     returnToTopLabel: '至顶',
     outline: {
-      level: 2,
+      level: 'deep',
       label: 'GUANの博客'
     },
     // aside: 'left',
@@ -51,8 +54,9 @@ function generateSidebarBlogConfig() {
     {
       text: '快速开始',
       items: [
-        { text: '初始化', link: '/blog/init/' },
-        { text: '配置简介', link: '/blog/config' }
+        { text: '初始化', link: '/blog/init' },
+        { text: '配置简介', link: '/blog/config' },
+        { text: '问题', link: '/blog/questions' }
       ]
     }
   ];

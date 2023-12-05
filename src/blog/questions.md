@@ -1,6 +1,6 @@
 # 遇到的问题
 
-## 引入图片
+## 1. 引入图片
 
 ### 问题描述
 
@@ -13,3 +13,15 @@
 ### 解决方法
 
 相对引入 `![main](../public/blog/main.jpg)`
+
+### 2. 更改 port
+
+package.json
+
+```json{2}
+"scripts": {
+    "docs:dev": "vitepress dev config --port 3006",
+}
+```
+
+### 3. 创建时间和更新时间
