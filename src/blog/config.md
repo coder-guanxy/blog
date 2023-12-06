@@ -10,6 +10,56 @@ title: "配置"
 
 在讲配置之前，先找到 `config/.vitepress/config.{mts|js} ` 文件，接下来所有的配置都是修改这个文件。这里的 config 目录就是之前的配置目录，如果是用 ts 的话，后缀是`.mts`，否则后缀是`.js`。
 
+
+做开发久了，对于生成的目录文件还是有些不习惯，希望可以使用平常开发时的目录结构
+
+```js
+.
+├─ config
+│  ├─ .vitepress
+│  |  ├─ cache
+│  |  ├─ dist
+│  |  ├─ theme
+│  │  └─ config.mts
+│  ├─ api-examples.md
+│  ├─ markdown-examples.md
+│  └─ index.md
+└─ package.json
+```
+
+
+```js
+.
+├─ _cache
+├─ dist
+├─ config
+│  ├─ .vitepress
+│  |  ├─ theme
+│  │  └─ config.mts
+├─ src
+│  ├─ api-examples.md
+│  ├─ markdown-examples.md
+│  └─ index.md
+└─ package.json
+```
+
+所要修改配置项
+
+config.mts 中
+
+```ts{3-5}
+export default defineConfig({
+  //...
+  outDir: '../dist/',
+  cacheDir: '../_cache/',
+  srcDir: '../src',
+  //...
+})
+```
+
+下面是对这些配置项的一些解释：
+
+
 ### base
 类型：string
 
