@@ -167,5 +167,74 @@ Nexus 工作在客户端和外部 npm 之间，并通过 Group Repository 合并
 
 
 
+## CI环境下 npm 优化
+
+
+
+### npm ci
+
+- Npm ci 要求项目中必须存在 package-lock.json 或 npm-shrinkwrap.json 文件
+- npm ci 完全根据 package-lock.json 文件安装依赖，这样可以保证开发团队成员使用版本一致的依赖
+- 因为根据 package-lock.json 文件安装，因此安装过程中，不需要求解依赖满足问题及构造依赖树，安装过程更加迅速
+- npm ci 在执行安装时会先删除项目中现有的 node_modules 目录，重新安装
+- npm ci 只能一次性安装项目中所有的包，无法安装单个依赖包
+- 如果 package-lock.json 文件和 package.json 文件冲突，那么执行 npm ci 命令会报错
+- 执行 npm ci 永远不会改变 package.json 文件和 package-lock.json 文件内容
+
+基于此，在 CI 环境下使用 npm ci 代替 npm install
+
+
+
+### 为什么需要 lockfiles
+
+Package-lock.json 文件作用是锁定依赖安装结构，目的是保证在任意机器上执行 npm install 命令时都会得到相同的 node_modules 安装结果。
+
+
+
+为什么单一的 package.json 不能确定唯一的依赖树
+
+- 不同版本 npm 的安装依赖策略和算法不同
+- npm install 将根据 package,json 文件中的 semver-range version 更新依赖，某些依赖项自上次安装以来，可能已发布了新版本
+
+
+
+### 要不要将 lockfiles 提交到仓库
+
+这需要看项目定位：
+
+- 开发应用 - 建议将 package-lock.json 文件提交到代码版本仓库，这样可以保证项目成员，运维部署成员或 CI 系统，在执行 npm install 后能得到完全一致的依赖安装内容
+- 开发供外部使用的库 - 在不使用 package-lock.json 文件的情况下，可以复用主项目已经加载过的包，避免依赖重复，可减小体积
+  - 如果开发的库依赖了一个具有精确版本号的模块，那么提交 lockfiles 到仓库可能会造成同一个依赖的不同版本都被下载的情况。作为库的开发者，如果帧的有使用某个特定版本依赖的需要，一个更好的方式是定义 peerDependencies 内容
+
+推荐做法：将 package-lock.json 提交到代码库中，执行 npm publish 发布库的时候，lockfiles 会被忽略而不会被直接发布出去。
+
+
+
+### package.json 和 package-lock.json
+
+- 如果项目中只有 package.json 文件，执行 npm install 之后，会根据 package.json 生成一个 package-lock.json
+- 如果项目存在 package.json 和 package-lock.json ，同时两者版本兼容，则npm install会根据 package-lock.json 下载
+- 如果两者同时存在，则两者版本不兼容，执行 npm install 时，package-lock.json 文件会自动更新版本，与 package.json 文件的 semver-range 版本兼容
+
+
+
+### Package.json 中的 xxxDependencies
+
+- dependencies - 项目依赖
+- devDependencies - 开发依赖
+- peerDependencies - 同版本依赖
+- bundledDependencies - 捆绑依赖
+- optionalDependencies - 可选依赖
+
+
+
+并不是只有 dependencies 下的模块才会被打包，而 devDependencies 下的模块一定不会被打包，实际上，模块是否作为依赖被打包，完全取决于项目是否引入了该模块。
+
+
+
+dependencies 和 devDependencies 在业务中更多起到规范作用
+
+
+
 
 
