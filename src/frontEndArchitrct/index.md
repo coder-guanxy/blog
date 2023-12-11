@@ -236,5 +236,198 @@ dependencies 和 devDependencies 在业务中更多起到规范作用
 
 
 
+peerDependencies 表示同版本依赖，如果你安装了我，那么最好也安装我对应的依赖
+
+主要使用场景特点：
+
+- 插件不能单独运行，插件正确运行的前提，必须先下载安装核心依赖库
+- 不建议重复下载核心依赖库
+
+
+
+bundledDependencies 表示捆绑依赖，和 npm pack 有关。不常用
+
+optionalDependencies 表示可选依赖，即使安装失败，也不会影响整个安装过程。一般很少使用。
+
+
+
+
+
+## corejs 及 polyfill 理念
+
+
+
+本章学习目标：
+
+- 通过 core-js，我们可以窥见前端工程化的方方面面
+- Core-js 和 Babel 深度绑定，因此学习 core-js 也能帮助开发者更好地理解 Babel 生态，进而加深对前端生态的理解
+- 通过 core-js 的解析，我们可以梳理前端领域一个极具特色的概念 - polyfill
+
+
+
+### Corejs 工程
+
+Core-js 是一个通过 lerna 搭建的 Monorepo 风格的项目，在它的包文件中，我们可以看到五个相关的包：core-js, core-js-pure, core-js-compact, core-js-builder, core-js-bundle。
+
+- Core-js - 实现的基础 polyfill 能力是整个 core-js 的核心
+
+  ```js
+  import "core-js" // 全局引入
+  ```
+
+- Core-js-pure - 提供不污染全局变量的 polyfill 能力
+
+  ```js
+  import _from from "core-js-pure/features/array/from"
+  ```
+
+- Core-js-compact 维护了遵循 Browserslist 规范的 polyfill 需求数据
+
+  ```js
+  const { list, targets } = require("core-js-compact")({ targets: "> 2.5%" })
+  ```
+
+- Core-js-builder 可以结合 core-js-compact 及 core-js 使用
+
+  ```js
+  require("core-js-builder")({
+  	targets: "> 0.5%",
+  	filename: "./my-core-js-bunlde.js"
+  }).then(core => {}).catch(err => {})
+  // 符合需求的 core-js polyfill 将被打包到 my-core-js-bundle.js 文件中
+  ```
+
+
+
+Core-js 将自身充分解耦，提供的多个包都可以被其他项目依赖
+
+- core-js-compact 可以被 Babel 生态使用，由 Babel 分析出环境需要的 polyfill.
+- Core-js-builder 可以被 Node.js 服务使用，构建出不同场景所需的 polyfill 包。
+
+从宏观设计上来说，core-js 体现了工程复用能力。
+
+
+
+#### 如何复用一个 polyfill
+
+站在工程化的角度，从 core-js 的视角出发来看，
+
+此处以 Array.prototype.every 的 polyfill 为例。
+
+思路：
+
+Core-js-pure 不同于 core-js，它提供了不污染命名空间的引用方式，因此它的核心逻辑实现，就需要被 core-js-pure 和 core-js 同时引用，只要区分最后导出的方式即可。
+
+实际上，  Array.prototype.every  的 polyfill 核心逻辑在 ./packages/core-js/modules/es.array.every.js 中实现
+
+在 core-js 中，作者通过 ../internals/export 方法导出了实现原型。表示 core-js 需要在数组 Array 的原型之上以”污染数组原型“的方式来扩展方法
+
+在 core-js-pure 则单独维护了一份 export 镜像 ../internals/export
+
+> 本书作者认为：既然是 Monorepo 风格的仓库，也许一种更好的设计是将 core-js 核心 polyfill 单独放入一个包中，由 core-js 和 core-js-pure 分别进行引用 - 这种方式更能利用 Monorepo 的能力，且能减少构建过程中的魔法常量处理。
+
+
+
+#### 寻找最佳的 polyfill 方案
+
+
+
+##### polyfill 是什么？
+
+ 简单来说，polyfill 就是用社区上提供的一段代码，让偶我们能在不兼容某些新特性的浏览器上使用该新特性。
+
+:tipping_hand_man:不一定是新特性，也可能是某些不统一的 API
+
+
+
+##### 为什么需要polyfill？
+
+随着前端的发展，尤其是 ECMAScript 的迅速成长及浏览器的频繁的更新迭代。
+
+
+
+##### 如何能再工程中寻找并设计一个”最完美“的 polyfill 方案？
+
+最完美：
+
+- 侵入性最小
+- 工程化，自动化程度最高
+- 业务影响最低
+
+
+
+###### 第一种方式：
+
+手动打补丁：es5-shim, es6-shim
+
+特点：简单直接
+
+缺点：不是一个工程化的解决方案，笨重，难以维护
+
+
+
+###### 第二种方式：
+
+Babel-polyill 结合 @babel/preset-env + useBuiltins(entry) + preset-env targets 
+
+```json
+{
+  "presets": [
+    "@babel/env", {
+      "useBuiltIns": "entry",
+      "targets": {chrome: 44}
+    }
+  ]
+}
+```
+
+
+
+特点：@babel/preset-env 定义了 Babel 所需插件，同时 Babel 根据 preset-env targets 配置的支持环境自动按需加载 polyfill.
+
+缺点：业务的代码中并没有用到配置环境填充的 polyfill, 那么 polyfill 的引入反而带来了引用浪费的问题，实际上，环境需要是一回事儿，代码需要又是另外一回事儿。
+
+
+
+第三种方式：
+
+Babel-polyill 结合 @babel/preset-env + useBuiltins(usage) + preset-env targets 
+
+其中区别在于 useBuiltIns 的配置一个是 entry 一个是 usage
+
+Entry： 在工程代码入口处需要添加 `imort '@babel/polyfill'`
+
+Usage: 可以真正根据代码情况分析 AST 并进行更细粒度的按需引用。
+
+```json
+{
+  "presets": [
+    "@babel/env", {
+      "useBuiltIns": "usage",
+      "targets": {chrome: 44}
+    }
+  ]
+}
+```
+
+
+
+
+
+第四种方式：
+
+在动态打补丁，以 Polyfill.io 为代表。它提供了 CDN 服务，使用者可以根据环境生成打包链接。
+
+
+
+按需打补丁意味着 bundle 体积更小，直接决定了应用的性能。
+
+按需主要包括两方面：
+
+- 按照用户终端环境打补丁
+- 按照业务代码使用情况打补丁
+
+
+
 
 
