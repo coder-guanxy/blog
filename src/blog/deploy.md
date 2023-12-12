@@ -1,5 +1,7 @@
 # 部署
 
+主要是远程仓库的创建，以及本地仓库的关联
+
 ## 远程 GitHub 仓库
 
 ### 创建 GitHub 仓库
@@ -102,7 +104,7 @@ jobs:
 - 进入到 learnBlog 项目
 - learnBlog 项目新增 `.gitignore` 直接执行下面的 shell 脚本生成即可
    ```bash
-   echo "/node_module/\r\n/_cache/\r\n/dist/" > .gitignore
+   echo "/node_modules/\r\n/_cache/\r\n/dist/" > .gitignore
    ```
 	 如果上面的不能执行：可以先创建 .gitignore 文件, 然后将文件内容替换为上面的内容
 
@@ -132,11 +134,14 @@ jobs:
 - 将项目的 git 与 github 仓库进行连接配置
 ```bash
   #配置远程仓库
-  > git config use.name [github 仓库的名字]
-  > git config use.email [github 仓库的邮箱]
+  > git config --local use.name [github 仓库的名字]
+  > git config --local use.email [github 仓库的邮箱]
 
   #github 的 leanBlog 仓库的地址就是上面获取的远程仓库地址
   > git remote add origin [github 的 leanBlog 仓库的地址]
+
+  #现在的分支为 master， 由于 github 把默认分支改为了 main 
+  > git checkout -b main
 
   #然后再查看刚才的配置是否配置成功
   > git config --list 
@@ -145,11 +150,20 @@ jobs:
   #下面是我的仓库地址配置 - 注意：空格而不是等号
   > git remote add origin  https://github.com/coder-guanxy/learnBlog.git
   ```
-
   ### 将本地仓库的代码推送到远程仓库
   ```bash
    > git push -u origin master
   ```
+  如果能推上去就成功了，但是如果没有推上去，可以将 github 改为 gitee 国内的更加稳定
+  也可不使用 github pages 直接使用 gitee pages. 这里我使用 gitee 关联 github，意思是将代码提交到 gitee 上然后让 gitee 自动同步到 github pages 然后在自动部署到 github pages 上
+
+  gitee pages 需要上传身份证正反面和手持身份证正反面才能开通
+
+  ### 使用 gitee 中间转一道
+  1. 登录 gitee
+  2. 新建仓库
+  3. 上面的步骤类似 github 新建仓库的介绍
+  4. 关联 github 仓库
 
 
   ## 设置 GitHub Pages
