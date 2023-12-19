@@ -429,5 +429,373 @@ Usage: 可以真正根据代码情况分析 AST 并进行更细粒度的按需�
 
 
 
+## Babel
+
+`Babel is JavaScript compiler`
+
+Babel 就是一个 Javascript 的编译器
 
 
+
+一方面：主要是前端语言特性和宿主环境（浏览器，Node.js 等）高速发展，但宿主环境无法第一时间支持新语言特性，而且开发者又需要兼容各种宿主环境，因此语言特性的降级称为刚需。
+
+一方面：前端框架"自定义 DSL"的风格越来越明显，使用前端各种代码被编译为 JavaScript 代码的需求成为标配。
+
+- 语法转换，一般是高级语言特性的降级
+- Polyfill 特性的实现和接入
+- 源码转换，比如 JSX 等
+
+
+
+Babel 的设计需要秉承一下理念：
+
+- 可插拔（Pluggable）
+- 可调试（Debuggable）
+- 基于协定（Compact）
+
+
+
+编译是 Babel 的核心目标，因此它自身的实现基于编译原理，深入 AST 来生成代码，同时需要工程化协作，需要和各种工具相互配合。
+
+
+
+### Babel Monorepo 架构包解析
+
+
+
+Babel 是一个使用 Lerna 构建的 Monorepo 风格的仓库，其 ./packages 目录下有 140 多个包，这些包的作用可以分为两种：
+
+- Babel 的一些包的意义在工程上起作用，因此对于业务来说是不透明的，比如一些插件可能被 Babel preset 预设机制打包并对外输出。
+- Babel 的另一些包是供纯工程项目使用的，或者运行在 Node 环境中。
+
+
+
+@babel/core 是 Babel 实现转换的核心，它可以根据配置进行源码的编译转换。
+
+@babel/cli 是 Babel 提供命令行，可以在终端中通过命令行方式运行，编译文件或目录。
+
+
+
+@babel/cli 负责获取配置内容，并最终依赖 @babel/core 完成编译。
+
+
+
+@babel/standalone 可以在非 Node.js 环境（比如浏览器环境）下自动编译 type 值为 text/babel 或 text/jsx 的 script 标签。
+
+
+
+@babel/parser 是 Babel 用来对 JavaScript 语言进行解析的解析器。它的实现主要依赖并参考了 acorn 和 acorn-jsx
+
+
+
+针对源码编译得到的 AST，有了 AST，还需要对它进行修改，以产出编译后的代码.
+
+ @babel/types 该包提供了对具体的 AST 节点进行修改的能力。
+
+得到编译后的 AST 之后，最后使用 @babel/generator 对新 AST 进行聚合并生成 JavaScript 代码。
+
+```
+ 
+ Source Code => @babel/core => AST => @babel/traverse(@babel/types) => AST => @babel/generator => Output code
+ 
+```
+
+
+
+在工程中，我们需要 Babel 做到的编译降级，而这个编译降级一般通过 @babel/preset-env 来配置。@babel/preset-env 允许我们配置需求支持的目标环境，利用 babel-polyfill 完成补丁接入。
+
+
+
+@babel/polyfill 其实就是 core-js 和 regenerator-runtime 两个包结合。
+
+
+
+#### @babel/plugin-transform-runtime 和 @babel/runtime
+
+@babel/plugin-transform-runtime 可以重复使用 babel 注入的 helper 函数，达到节省代码空间的目的。
+
+@babel/runtime 中含有 Babel 编译所需的一些运行时 helper 函数，同时提供了 regenerator-runtime 包，对 generator 和 async 函数进行编译降级。
+
+
+
+- @babel/plugin-transform-runtime 需要和 @babel/runtime  配合使用
+- @babel/plugin-transform-runtime 在编译时使用，作为 devDependencies.
+- @babel/plugin-transform-runtime 将业务代码进行编译，引用 @babel/runtime 提供的 helper 函数，达到缩减编译产出代码体积的目的
+- @babel/runtime 用于运行时，作为 dependencies.
+- @babel/plugin-transform-runtime 和 @babel/runtime   配合使用除了可以实现 “代码瘦身”，还能避免污染全局作用域。
+
+------------
+
+
+
+- @babel/plugin 是 Babel 插件集合
+- @babel/plugin-syntax-* 是 Babel 的语法插件
+- @babel/plugin-proposal-* 用于对提议阶段的语言特性进行编译转换
+- @babel/plugin-transform-* 是 Babel 的转换插件
+- @babel/template 可以将字符串代码转换为 AST,
+- @babel/node 提供了在命令行执行高级语法的环境
+- @babel/register 实际上为 require 增加了一个 hook，使用之后，所有被 node.js 引用的文件都会先被 Babel 转码
+
+
+
+### Babel 工程生态架构设计和分层理念
+
+
+
+辅助层 -> 基础层 -> 胶水层 -> 应用层
+
+
+
+```
+应用层：
+@babel/cli  @babel/standalone @babel/loader @babel/node @babel/register @babel/eslint-parser
+```
+
+
+
+```
+胶水层：
+@babel/plugin @babel/presets @babel/polyfill @babel/helpers @babel/runtime
+```
+
+
+
+```
+基础层：
+@babel/parser => @babel/polyfill => @babel/runtime
+```
+
+
+
+```
+辅助层：
+@babel/types @babel/code-frame @babel/template @babel/heighlight
+```
+
+
+
+基础层提供了基础的编译能力，完成分词，解析 AST ，生成产出代码的工作。在基础层中，我们将一些抽象能力下沉到辅助层，这些抽象能力被基础层使用。在基础层之上的胶水层，我们构建了如 @babel/presets 等预设/插件能力，这些类似“胶水”的包完成了代码编译降级所需补丁的构建，运行时逻辑的模块化抽象等工作。在最上层的应用层，Babel 生态提供了终端命令行，浏览器编译等应用级别的能力
+
+ 
+
+
+
+## 前端工具链：统一标准化的 babel-preset
+
+
+
+### 应用项目构建和公共库构建的差异
+
+- 对于一个应用项目来说，它“只要能在需要兼容的环境中跑起来”就达到基本目的
+- 对于一个公共库来说，它可能被各种环境所引用或需要支持各种兼容需求，因此它要兼容性能和易用性，要注重质量和广泛度
+
+
+
+##### 一个企业级公共库的设计原则
+
+对于开发者，应最大确保开发体验：
+
+- 最快地搭建调试和开发环境
+- 安全地发版维护
+
+对于使用者，应最大化确保使用体验
+
+- 公共库文档建设完善
+- 公共库质量有保障
+- 接入和使用负担最小
+
+
+
+基于上述原则，在团队里设计一个公共库前，需要考虑以下问题。
+
+- 自研公共库还是使用社区已有的“轮子”
+- 公共库的运行环境是什么？这将决定公共库的编译构建目标。
+- 公共库是偏向业务还是“业务 free” 的？这将决定公共库的职责和边界
+
+
+
+#### 指定一个统一标准化的 babel-preset
+
+设计方案：
+
+- 支持 NODE_ENV = 'development' | 'production' | 'test' 三种环境，并有对应的优化措施
+- 配置插件默认不开启 Babel loose: true 配置选项，让插件的行为尽可能的遵循规范，但对有较严重性能损耗或有兼容性问题的场景，需要保留修改入口。
+- 方案落地后，应该支持应用编译和公共库编译。
+  - @Lucas/babel-preset/app - 负责编译除 node_modules 以外的业务代码
+  - @Lucas/babel-preset/dependencies - 负责编译 node_modules 第三方代码
+  - @Lucas/babel-preset/library - 按照当前 Node.js 环境编译输出代码
+  - @Lucas/babel-preset/library/compact - 会将代码编译降级为 ES5 代码
+
+对于企业级公共库，建议使用标准 ES 特性来发布；对 Tree Shaking 有强烈需求的库，应同时发布 ES Module 格式代码。企业级公共库发布的代码不包含 polyfill，由使用方统一处理。
+
+
+
+## 从 0 到 1构建一个符合标准的公共库
+
+
+
+
+
+
+
+## 代码拆分与按需加载
+
+代码拆分和按需加载能够使初始代码的体积更小，页面加载更快
+
+
+
+### 代码拆分与按需加载技术的实现
+
+
+
+按需加载表示代码模块在交互时需要动态导入；
+
+按需打包针对第三方依赖库及业务模块，只打包真正在运行时可能会用到的代码；
+
+
+
+按需打包一般通过两种方法实现：
+
+- 使用 ES Module 支持的 Tree Shaking 方案，在使用构建工具打包时完成按需打包。
+- 使用 babel-plugin-import 为主的 Babel 插件实现自动按需打包
+
+
+
+1. ##### 使用 Tree Shaking 实现按需打包
+
+
+
+如果第三方库提供了 ES Module 版本，并开启了 Tree Shaking 功能，那么我们就可以通过 “摇树” 特性将不会被使用的代码在构建阶段移除
+
+
+
+2. ##### 编写 Babel 插件实现自动按需打包
+
+如果第三方库不支持 Tree Shaking 方案，我们依然可以通过 Babel 插件改变业务代码中对模块的引用路径来实现按需打包。
+
+
+
+比如：babel-plugin-import
+
+```
+import { Button, Input } from 'antd'
+```
+
+转化为
+
+```
+import _Button from 'antd/lib/button'
+import _Input from 'antd/lib/input'
+```
+
+
+
+#### 重新认识动态导入
+
+标准用法的 import 操作属于静态导入，会使所有被导入的模块在加载时就被编译。
+
+当我们需要按需加载一个模块或根据运行时事件选定一个模块时，动态导入就变得尤为重要。
+
+
+
+Import() 是一个 Functon-like 语法形式。
+
+- 动态导入并非继承自 Function.prototype，因此不能使用 Function 构造函数原型上的方法。
+- 动态导入并非继承自 Object.prototype，因此不能使用 Object 构造函数原型上的方法。
+
+
+
+dynamicImport 函数：
+
+```
+```
+
+
+
+通过动态插入一个 script 标签来实现对目标 script URL 的加载。并将模块导出内容赋值给 Window 对象。
+
+
+
+webpack 提供了三种支持代码拆分和按需加载相关能力
+
+- 通过入口配置手动分割代码
+- 动态导入
+- 通过 splitChunk 插件提供公共代码（公共代码分割）。
+
+
+
+动态导入：通过调用 import()，被请求的模块和它引用的所有子模块会被分离到一个单独的 chunk 中。
+
+
+
+#### Webpack 中的 splitChunk 插件和代码拆分
+
+ 代码拆分的核心意义在于避免重复打包及提高缓存利用率，进而提升访问速度。
+
+比如：
+
+- 不常变化的第三方依赖库 - 方便对第三方依赖库缓存
+- 抽离公共逻辑 - 减小单个文件的体积
+
+
+
+Webpack 4.0  splitChunk 插件在模块满足下述条件时，将自动进行代码拆分：
+
+- 模块时可以共享的（即被重复引用），或存储于 node_modules 中
+- 压缩前的体积大于 30 kb
+- 按需加载模块时，并行加载的模块数不得超过 5 个
+- 页面初始化加载时，并行加载的模块数不得超过 3 个
+
+
+
+## Tree Shaking: 移除 JavaScript 上下文中的未引用代码
+
+
+
+在传统的编译型语言中，一般由编译器将未引用代码从 AST 中删除，而前端 JS 中并没有正统的的“编译器”概念，因此 Tree Shaking 需要工具链中由工程化工具实现。
+
+
+
+#### Tree Shaking 为什么要依赖 ESM 规范？
+
+Tree Shaking 是在编译时进行未引用代码消除的，因此它需要在编译时确定依赖关系，进而确定哪些代码可被“摇掉”，而 ESM 规范具备一下特点：
+
+- import 模块名只能是字符串常量。
+- import 一般只能在模块的顶层出现。
+- import 依赖的内容是不可变的
+
+这些特点使得 ESM 规范具有静态分析能力。而 CommonJS 定义的模块化规范，只有在执行代码后才能动态确定依赖模块，因此不具备支持 Tree Shaking 的先天条件。
+
+
+
+#### 什么是副作用模块，如何对副作用模块进行 Tree Shaking 操作
+
+
+
+> 副作用（effect 或者 side effect）指在导入时会执行特殊行为的代码，而不是仅仅暴露一个或多个导出内容。polyfill 就是一个例子，尽管其通常不提供导出，但是会影响全局作用域，因此 polyfill 将被视为一个副作用。
+
+
+
+上面是 webpack 官网上的一段话，概括起来**副作用就是会影响全局作用域的代码**
+
+
+
+
+
+#### CSS 和 Tree Shaking
+
+
+
+CSS 的 Tree Shaking 要在样式表中找出没有被应用的选择器的样式代码，并对其进行删除。
+
+- 遍历所有 CSS 文件的选择器
+- 在 JS 代码中对所有 CSS 文件的选择器进行匹配
+- 如果没有匹配到则删除对应选择器的样式代码
+
+
+
+在样式世界中，PostCSS 起到了 Babel 的作用。PostCSS 提供了一个解析器，能够将 CSS 解析成 AST，我们可以通过 PostCSS 插件对 CSS 对应的 AST 进行操作，实现 Tree Shaking。
+
+
+
+推荐一个 wepack 插件 purgecss-webpack-plugin
