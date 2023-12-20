@@ -40,7 +40,8 @@ module.exports = {
     nav: navConfig(),
     sidebar: {
       '/react/source': sidebarConfig(),
-      '/blog/': generateSidebarBlogConfig()
+      '/blog/': generateSidebarBlogConfig(),
+      "/tools/vite/": generateSidebarViteConfig()
     },
     editLink: {
       pattern: 'https://github.com/coder-guanxy/blog/tree/main/src/:path',
@@ -48,6 +49,22 @@ module.exports = {
     }
   }
 };
+
+function generateSidebarViteConfig() {
+  return [
+    {
+      text: 'vite',
+      items: [
+        { text: '简介', link: '/tools/vite/guide' },
+        { text: '整体流程', link: '/tools/vite/process' },
+        { text: 'cli', link: '/tools/vite/cli' },
+        { text: '开发流程', link: '/tools/vite/dev' },
+        { text: 'HMR流程', link: '/tools/vite/hmr' },
+        { text: '打包流程', link: '/tools/vite/prod' },
+      ]
+    }
+  ]
+}
 
 function generateSidebarBlogConfig() {
   return [
@@ -81,6 +98,14 @@ function navConfig() {
   return [
     { text: '导航', link: '/' },
     { text: '搭建博客', link: '/blog/init' },
+    {
+      text: '前端工程',
+      items: [
+        { text: 'vite', link: '/tools/vite/guide' },
+        // { text: 'webpack', link: '/tools/vite/webpack' },
+        // { text: 'Babel', link: '/tools/vite/Babel' }
+      ]
+    },
     {
       text: 'React',
       items: [
