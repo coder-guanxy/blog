@@ -133,7 +133,7 @@ const get = createGetter()
 - 数组特殊处理
 - 
 
-```
+```ts
 function createGetter(isReadonly = false, shallow = false) {
   return function get(target: Target, key: string | symbol, receiver: object) {
      //...
@@ -151,9 +151,22 @@ function createGetter(isReadonly = false, shallow = false) {
         return hasOwnProperty
       }
     } 
+    
+    	// 从 target 对象上获取到值
+    	const res = Reflect.get(target, key, receiver)
       
       // 对 target 的 key 进行跟踪
       track(target, TrackOpTypes.GET, key)
+    
+     // 如果得到依然是一个对象，继续进行 proxy 代理 
+    if (isObject(res)) {
+      // Convert returned value into a proxy as well. we do the isObject check
+      // here to avoid invalid value warning. Also need to lazy access readonly
+      // and reactive here to avoid circular dependency.
+      return isReadonly ? readonly(res) : reactive(res)
+    }
+
+    return res
   }
 }
 ```
