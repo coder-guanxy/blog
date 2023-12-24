@@ -780,6 +780,106 @@ Tree Shaking 是在编译时进行未引用代码消除的，因此它需要在�
 
 
 
+具有副作用的模块难以被 Tree Shaking 优化
+
+webpack 在解决副作用的是怎么做的？
+
+- 利用 package.json 的 sideEffect 属性来告诉工程化工具，哪些模块具有副作用，哪些模块不具有副作用
+
+
+
+##### 一个 Tree Shaking 友好的导出模式
+
+不利于进行 Tree Shaking 处理的情况如下：
+
+- 导出一个包含多个属性和方法的对象
+- 导出一个包含多个属性和方法的类
+- 使用 export default 方法导出
+
+推荐：遵循原子化和颗粒化原则导出 `export`
+
+
+
+#### 前端工程化生态和 Tree Shaking 实践
+
+
+
+##### Babel 和 Tree Shaking
+
+前提： Tree Shaking 依托于 ESM 规范
+
+问题：有些场景需要 Babel 将代码编译为 CommonJS 规范，比如 Jest。Jest 基于 Node.js 开发
+
+解决方法：根据环境不同采用不同的 Babel 配置
+
+生产：
+
+```js
+{
+	presets: [
+		["@babel/preset-env", { modules: false }]
+	]
+}
+```
+
+测试：
+
+```js
+{
+	presets: [
+		["@babel/preset-env", { modules: "commonjs" }]
+	]
+}
+```
+
+
+
+##### Webpack 和 Tree Shaking
+
+mode 为 production 时，会自动开启 Tree Shaking
+
+```js
+{
+	mode: "production",
+	optimization: {
+		usedExports: true,
+		minimizer: {
+			new TerserPlugin({}) // 支持删除未引用代码的压缩器
+		}
+	}
+}
+```
+
+
+
+Webpack 真正执行 Tree Shaking 时依赖了 TerserPlugin, UglifyJS 等压缩插件。Webpack 负责对模块进行分析和标记，而这些压缩插件负责根据标记结果进行代码删除。webpack 在分析时有三类相关标记。
+
+- used export： 被使用过的 export 会被标记为 used export.
+- unused harmony export：没被使用过的 export 会被标记为 unused harmony export.
+- harmony import: 所有 import 会被标记为 harmony import
+
+
+
+##### 设计一个兼顾 Tree Shaking 和易用性的公共库
+
+如果希望一个 npm 包既能提供 ESM 规范代码，又能提供 CommonJS 规范代码
+
+实际上 npm package.json 及社区工程化规范解决了这个问题
+
+```json
+{
+	"name": "Lib",
+	"main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+}
+```
+
+
+
+当 `require` 执行时，webpack 会找到 `dist/index.cjs.js`
+
+当 `import`执行时， webpack 会找到 `dist/index.esm.js` 
+
 
 
 #### CSS 和 Tree Shaking
@@ -799,3 +899,272 @@ CSS 的 Tree Shaking 要在样式表中找出没有被应用的选择器的样�
 
 
 推荐一个 wepack 插件 purgecss-webpack-plugin
+
+
+
+## 工程化思维：主题切换架构
+
+
+
+主要讲了怎么写一个 PostCSS 插件，将下面的内容进行转换（一般对于主题切换处理会使用其他方法） 
+
+
+
+```css
+a {
+	color: cc(GBK05A)
+}
+```
+
+转换为：
+
+```css
+a {
+	color: #333
+}
+
+html[data-theme='dark'] a {
+	color: #333
+}
+```
+
+
+
+## 14 解析 Webpack 源码，实现工具构建
+
+
+
+
+
+## 15 跨端解析小程序多端方案
+
+
+
+### 小程序多端方案出现的背景
+
+自微信小程序在用户规模及商业化方面取得巨大成功后，各巨头也纷纷建立起自己的小程序，这些小程序设计原理类似，但是开发方式并不互通。在此背景下，效率为先，也就出现了各种小程序多端方案。
+
+
+
+小程序多端方案的愿景很简单，就是使用一种 DSL，实现 “write once, run everywhere”.
+
+
+
+小程序多端放哪根据技术实现的不同可以大体划分为三类：
+
+- 编译时方案
+- 运行时方案
+- 编译时和运行时的结合方案
+
+目前主流的是第三种。
+
+
+
+小程序多端方案最终对外提供的使用方式可以分为以下几种：
+
+- 类 Vue 风格框架
+- 类 React 风格框架
+- 自定义 DSL 框架
+
+
+
+### 编译时方案 - 简洁
+
+vue 的设计风格和各小程序设计风格更加接近，因此， vue DSL 静态编译方案相对容易实现。
+
+vue 中单文件组件主要由 template, script, style 组成，分别对应小程序中的 . wxml template 文件，.js .json 文件，.wxss 文件
+
+小程序基本上都可以兼容 H5 环境中的 CSS, 因此 style 部分基本上可以直接平滑迁移，将 template 转换为 .wxml 文件时需要进行 HTML 标签和模板语法的转换。
+
+
+
+- 开发者代码（类 vue/ 类 react / 其他）
+- AST 产出（AST 分析）
+- 新 AST 产出（AST 修改）
+- 小程序代码（AST 产出）
+
+
+
+### 运行时方案
+
+
+
+对于一段 vue 代码，通过响应式理念监听数据变化，触发视图修改，放在小程序中，多端方案要做的就是监听数据变化，调用 setData 方法触发小程序渲染层的变化。
+
+
+
+以微信小程序为例，微信小程序平台规定，小程序页面中需要有一个 Page 方法，用于生成一个小程序实例，该方法是小程序官方提供的 API。
+
+对于业务写的 new vue 代码，多端平台要手动执行微信小程序平台的 page 方法，完成初始化处理
+
+```
+new Vue()
+
+// 在 vue 实例化时，会调用 vue.init 
+Vue.init = () => {
+	// 魔改 vue.init 方法，保留原始逻辑，并调用小程序 Page 方法
+	Page()
+}
+```
+
+
+
+多端方案内容了 vue 运行时版本，并实例化一个 vue 实例，同时在初始化阶段调用了小程序平台的 Page 方法，因此也就有了一个小程序实例。
+
+
+
+#### 具体实施：
+
+vue 基于响应式对数据进行监听，在数据改动时，新生成一份虚拟节点 VNode。接下来对比新旧两份虚拟节点，找到 diff, 并进行 patch 操作，最终更新真实的 DOM。
+
+因为小程序架构中并没有提供操作小程序节点的 API 方法，因此对于小程序多端方案，我们需要进行 vue 源码中的 patch 操作。又因为小程序隔离了渲染层和逻辑层，因此不需要处理渲染层，只需要调用 setData 方法，更新一份最新的数据即可
+
+
+
+我们秉承“数据部分让 vue 运行时版本接手，渲染部分让小程序架构接手”
+
+
+
+
+
+### 类 React 风格的编译时和运行时结合方案
+
+
+
+React 团队将 Reconciler 部分作为一个独立的 npm 包（react-reconiler）发布。在 react 环境下不同平台可以依赖 hostConfig 配置了 react-reconciler 互动，连接并使用 reconiler 能力，因此，不同平台的 renderers 函数在 hostConfig 中内容基本方法，即可构造自己的渲染逻辑，
+
+
+
+在初始化阶段及第一次进行 mount 操作中，我们通过 setData 方法初始化小程序。具体组发是，通过递归数据结构渲染小程序页面。接着，当数据发生变化时，我们通过 React Reconciler 阶段的计算信息，以及自定义 HostConfig 衔接函数更新数据，并通过 setData 方法触发小程序的渲染更新。
+
+ 
+
+#### 剖析 Taro Next
+
+Taro 团队提供的 taro-react 包是用来连接 react-reconciler 和 taro-runtime 的。它主要负责实现 HostConfig 配置。
+
+Taro-runtime 模拟了  DOM/BOM API，但是在小程序环境下，它并不能直接操作 DOM 节点，而是操作数据（即前面提到的 VNodeData,对应 taro 里面的 TaroNode）
+
+
+
+### 小程序多端方案的优化
+
+
+
+小程序多端框架主要由编译时和运行时两部分组成，一般来说，编译时做的事情越多，也就意味着运行时越轻量，负担越小，性能也越好。
+
+厚重的运行时一般意味着需要将完整的组件树从逻辑层传输到视图层，这将导致数据传输量增大，而且页面中存在更多的监听器。
+
+随着终端性能的增强，找到编译时和运行时所承担工作的平衡点，也显得至关重要。
+
+
+
+一般可以从一下几个方面来进一步实现性能优化：
+
+- 框架的包的大小：小程序的初始化加载性能直接依赖于资源的包大小，因此小程序多端框架的包大小至关重要。为此，各解决方案都从不同角度完成瘦身，比如 Taro 实现更轻量的 DOM/BOM API，不同 jsdom(size: 2.1MB)，Taro 的核心 DOM/BOM API 代码只有不到 1000 行。
+- 数据更新粒度：在数据更新阶段，小程序的 setData 方法所负载的数据一直是重要的优化方向，目前已经成为默认的常规优化方向，那么利用框架来完成 setData 方法调用优化也就理所应当了。比如：数据负载的扁平化处理和增量处理都是常见的优化手段。
+
+
+
+## 从移动端跨平台到 Flutter 的技术变革
+
+
+
+### 移动端跨平台出现的背景：
+
+- 移动端原生技术需要配备 IOS 和 Android 两个团队及技术栈，且存在发版周期限制，在开发效率上存在天然缺陷。
+- 原生跨平台技术虽然“出道”较早，但是个方案都难以达到完美程度，因此没有大一统的技术垄断。
+
+
+
+Hybrid 时期：
+
+- HTML + JS + CSS
+- Cordova
+- Ionic
+
+OEM 时期：
+
+- React Native
+- Weex
+
+自渲染时期：
+
+- Flutter
+
+
+
+最早的移动端跨平台是跨平台实践就是通过 WebView 双端运行 Web 代码。
+
+虽然 IOS 和 Android 系统难以统一，但是它们都对 Web 技术开放。
+
+
+
+JSBridge 是指：H5（Web View 容器）和原生平台的交互
+
+在原生平台中，JS 代码是运行在一个独立的上下文环境中的，这个独立的上下文环境和原生能力的交互过程是双向的。
+
+
+
+JS 调用原生的能力：
+
+- 注入 API - 原生平台通过 WebView 提供的接口，向 JS 上下文中（一般使用 Window 对象）注入相关方案和数据
+- 拦截 URL Scheme - 前端发送定义好的 URL Scheme 请求，并将相关数据放在请求体中，该请求被原生平台拦截后，由原生平台做出响应
+
+
+
+**原生能力调用 JS：**
+
+原生平台可以通过 WebView API 直接执行 JS 代码
+
+
+
+#### 缺点：
+
+- JS 上下文和原生通信频繁，导致性能较差。
+- 页面逻辑由前端负责编写，组件也是前端渲染而来的，造成性能短板
+- 运行 JS 的 Web View 内核在各平台上不统一
+- 国内厂商对于系统的深度定制，导致内核碎片化
+
+
+
+### React Native - OEM 的 Hybrid 方案
+
+主要的思想：开发者依然使用 Web 语言（如 React 框架或其他 DSL），但渲染基本交给原生平台处理。
+
+好处：视图层摆脱 WebView 的束缚，保障了开发体验，效率及使用性能。
+
+
+
+React Native 主要由 JS, C++, IOS/Android 三层组成，最重要的 C++ 层实现了动态链接库，起到了衔接前端和原生平台的作用。
+
+
+
+#### 缺点：
+
+- 数据通信过程是异步的，通信成本很高
+- React Native 仍有部分组件和 API 并没有实现平台统一
+
+
+
+### Flutter 新贵背后的技术变革
+
+ Flutter 组件依赖自身高性能的渲染引擎进行视图渲染。
+
+每个组件会被渲染在 Skia 上， Skia 是一个 2D 绘图引擎库，具有跨平台的特点。Skia 唯一需要的就是原生平台提供 Canvas 接口，实现绘制。
+
+
+
+Flutter 组件分为两种类型， StatelessWidget 无状态组件和 StatefullWidget 有状态组件。
+
+
+
+Flutter 技术方案主要分为三层：
+
+- Framework - 有 Dart 语言实现，业务代码直接运行在此层，提供了 Material Design 风格的组件，以及适合 IOS 系统的 Cupertino 风格的组件 
+- Engine - 主要由 C 或 C++ 实现，通过内置的 Dart 运行时，Flutter 提供了 Debug 模式下对 JIT（Just in time）的支持，以及在 Release 和 Profile 模式下的 AOT(Ahead of time) 编译生成原生 ARM 代码的能力
+- Embedder - 最底层的嵌入层
+
+
+
+Flutter 有了更好的跨端一致性和稳定性，以及更高的性能表现。
