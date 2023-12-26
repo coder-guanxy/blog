@@ -1168,3 +1168,253 @@ Flutter 技术方案主要分为三层：
 
 
 Flutter 有了更好的跨端一致性和稳定性，以及更高的性能表现。
+
+
+
+## 17 axios: 封装一个结构清晰的 Fetch 库
+
+不同环境支持不同的网络请求的 API。
+
+
+
+浏览器环境：
+
+- XMLHttpRequest
+- fetch
+
+Node环境：
+
+- http
+
+
+
+业务代码中通用的定制化功能：
+
+- 自定义headers
+- 统一断网/弱网处理
+- 接口缓存处理
+- 接口统一错误提示
+- 接口统一数据处理
+- 统一数据层结合
+- 统一请求埋点
+
+
+
+业务级别分层：
+
+- 项目层
+- 页面层
+- 组件层
+
+
+
+如果设计者在项目层的封装上做了几乎所有事情，囊括了所有请求相关的规则，则很容易使封装复杂，设计过度。不同层级的功能和职责是不同的，错误的使用和设计师让项目变得更加混乱的诱因之一。
+
+
+
+合理的设计：底层部分保留对全局封装的影响范围，而在项目层保留对页面层的影响能力，在页面层保留对组件层的影响力。
+
+
+
+### axios 设计
+
+功能：
+
+- 在浏览器端，使用 XMLHttpRequest 发送请求
+- 支持 Node 环境发送请求
+- 支持 Promise API，使用 Promise 风格语法
+- 支持请求和响应拦截
+- 支持自定义修改请求和返回内容
+- 支持取消请求
+- 默认支持 XSRF 防御
+
+
+
+主要从拦截器思想，适配器思想，安全思想三方面
+
+
+
+#### 拦截器思想
+
+
+
+拦截器思想是 axios 带来的最具启发性的思想之一。它提供了分层开发时借助拦截行为注入自定义能力的功能。
+
+
+
+拦截器主要的工作流程：
+
+- 任务注册
+- 任务编排
+- 任务调度（执行）
+
+
+
+##### 任务注册
+
+在请求发出前`axios.interceptors.request.use` 注入拦截逻辑
+
+
+
+##### 任务编排
+
+按照调用顺序将注册的函数依次放入数组中 `[..., request, dispatchRequest, response, ...]`
+
+
+
+##### 任务调度
+
+通过一个 while 循环遍历迭代 chain 数组方法，并基于 Promise 实例回调特性串联执行各个拦截器。
+
+
+
+#### 适配器思想
+
+axios 同时支持在 Node 环境和浏览器环境下发送请求。
+
+为了适配不同环境, axios 提供了适配器 Adapter。
+
+axios 支持使用方实现自己的 Adapter, 自定义不同环境中的请求实现方式，也提供了默认的 Adapter。
+
+一个 Adapter 需要返回一个 Promise 实例。
+
+
+
+#### 安全思想
+
+主要依赖双重 cookie 来防御 CSRF。
+
+axios 默认配置了 xsrfCookieName 和 xsrfHeaderName，实际开发中可以按具体情况传入配置信息。
+
+
+
+源码：
+
+```
+var chain = [dispatchRequest, undefined]
+var promise = Promise.resolve(config)
+
+this.interceptors.request.forEach(function unshiftRequestInterceptor(interceptor){
+	chain.unshift(interceptor.fulfilled, interceptor.rejected)
+})
+
+this.interceptors.response.forEach(function puseResponseInterceptor(interceptor){
+	chain.push(interceptor.fulfilled, interceptor.rejected)
+})
+
+// 任务调度
+while(chain.length) {
+	promise = promise.then(chain.shift(), chain.shift())
+}
+
+```
+
+
+
+
+
+
+
+## 18 对比 Koa 和 Redux: 解析前端中间件
+
+
+
+这章节重点介绍前端两个典型的中间件： Koa 的洋葱模型，Redux 的 compose 函数
+
+
+
+Koa 中间件使用
+
+```js
+app.use((ctx, next)=> {
+	console.log('before')
+	next();
+	console.log(after'')
+})
+```
+
+
+
+源码：
+
+```js
+use(fn) {
+	this.middleware.push(fn);
+	return this;
+}
+
+callback(){
+	const fn = compose(this.middleware)
+	//....
+}
+```
+
+
+
+Compose 函数源码:
+
+使用递归的思想进行下一步调用，直到调到没有 fn
+
+```js
+function compose(middleware){
+	return function(context, next){
+		let index = -1;
+		
+		return dispatch(0);
+		
+		function dispatch(i) {
+      
+      if(i <= index) return Promise.reject(new Error('next() calledmultiple times'));
+      
+      index = i;
+      
+      // 取出第 i 个中间件
+      let fn = middleware[i];
+      
+      if(i === middleware.length) fn = next
+      
+      // 已经渠道最后一个中间件，直接返回 Promise 实例，进行串联
+      // 保证最后一个中间件调用 next 方法时，也不会报错
+      if(!fn) return Promise.resolve()
+      
+      try {
+        // 把 ctx 和 next 方法传入中间件 fn.
+        // 并将执行结果使用 Promise.resolve 包装
+        // dispatch.bind(null, i + 1) 即调用下一个中间件
+        
+        return Promise.resolve(fn(context, dispatch.bind(null, i + 1)))
+      }catch(err) {
+        return Promise.reject(err) 
+      }
+      
+    }
+	
+	}
+}
+```
+
+
+
+- Koa 中间件机制被社区形象地总结为 “洋葱模型”。外层的中间件可以影响内层的请求和响应阶段，内层的中间件只能影响外层的相应阶段
+- 通过洋葱模型控制调用下游中间件，直到下游没有中间件且堆栈执行完毕，最终流回上游中间件。
+
+优点：对日志记录及错误处理等需求非常友好
+
+
+
+Redux 也实现了一个 compose 方法，用于完成中间件的注册和串联。
+
+源码：
+
+```
+function compose(...funcs){
+	return funcs.redux((a, b) => (...args) => a(b(...args)))
+}
+```
+
+
+
+```
+compose([fn1, fn2, fn3])(args) => fn1(fn2(fn3(args))) 
+```
+
