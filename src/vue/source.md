@@ -1,7 +1,7 @@
 ---
-title: vue 源码
+title: vue 源码之 reative | effect
 ---
-### vue source
+### vue source - reative | effect
 
 对 vue 进行极简分析，重点是快速掌握整个响应式流程。其他数据结构和其他 API，大致都是根据极简流程，做一些扩展，进行特殊处理。 
 
@@ -14,7 +14,7 @@ title: vue 源码
 
 
 
-## 核心 API
+## 响应式核心 API - reative | effect
 
 ### reactive 
 
@@ -247,7 +247,7 @@ track 函数的主要就是构建一个数据结构，然后调用 trackEffects 
 
 
 
-```
+```ts
 export function track(target: object, type: TrackOpTypes, key: unknown) {
 	// 存在 effect
   if (shouldTrack && activeEffect) {
@@ -272,7 +272,7 @@ export function track(target: object, type: TrackOpTypes, key: unknown) {
 
 有关 createDep 也很简单，主要 new 一个 Set，然后返回  
 
-```
+```ts
 export const createDep = (effects?: ReactiveEffect[]): Dep => {
   const dep = new Set<ReactiveEffect>(effects) as Dep
   // ...
@@ -557,4 +557,119 @@ export const mutableHandlers = {
 
 
 我们使用 reactive 声明一个对象，声明的对象在 effect 副作用函数中使用（利用 get 将当前的 effect 收集起来），当改变对象中的某个 key 的值时，触发（执行）effect 副作用函数。
+
+
+
+举个例子：
+
+```
+import { reactive, effect } from "vue"
+
+const o = reactive({ data: 1 });
+
+effect(() => {
+	console.log(o.data)
+})
+
+setTimeout(() => {
+	o.data = 2
+}, 2000)
+```
+
+
+
+当 2 秒后，o.data 改变时，会执行 effect 中的副作用函数。
+
+整个流程步骤：
+
+- reactive - 使用 proxy 进行代理
+- effect 中的函数，会先执行一遍，函数中调用 o.data， 读取 o 对象下面的 data 属性（也就是 o 下面 data 的 get 操作）
+- 执行 get -> trace 将当前 effect 副作用函数和 o 对象下面的 data 属性进行绑定（缓存）。
+- 2 秒后，执行 o 对象下面 data 属性的 set 操作（赋值操作）
+- 找到缓存中 o 对象下面 data 属性相关的 effect 副作用函数
+- 重新执行一遍。
+
+
+
+##### effect - 收集副作用函数
+
+- 主要给传入的副作用函数 fn 进行 ReactiveEffect 包装一下
+- 将 fn 执行一遍
+
+```ts
+export function effect(
+  fn: () => T,
+  options?: ReactiveEffectOptions
+){
+  //...
+  
+  const _effect = new ReactiveEffect(fn)
+
+  //...
+  // 先执行一遍 fn，用于通过 get 操作收集当前副作用函数
+  _effect.run()
+  
+  //...
+}
+```
+
+
+
+##### ReactiveEffect - 副作用的包装类
+
+- 主要 run 函数，用来执行 fn
+- 将当前副作用实例赋值给全局变量 activeEffect，用于 track 收集
+
+```ts
+export class ReactiveEffect<T = any> {
+	//...
+  constructor(public fn: () => T) {}
+  run() {
+    //...
+    try {
+      //...
+      // 将此实例赋值为全局变量 activeEffect
+      activeEffect = this
+      //...
+      // 执行 fn, 将执行结果进行返回
+      return this.fn()
+    } finally {
+      // 执行完毕将 activeEffect 进行还原 - 源码不是这样的
+      activeEffect = void 0；
+    }
+    
+    //...
+  }
+}
+```
+
+
+
+上面就是 effect 的主要代码了，其实也很简单，就是将 fn 包裹，然后赋值给 activeEffect
+
+
+
+简化之后就是：
+
+```js
+class ReactiveEffect{
+   constructor(fn) {
+   		this.fn = fn;
+   }
+  run() {
+    try {
+      activeEffect = this;
+    	return this.fn() 
+    } finally {
+      // 执行完毕将 activeEffect 进行还原 - 源码不是这样的
+      activeEffect = void 0；
+    }
+  }
+}
+
+export function effect(fn){
+	 const _effect = new ReactiveEffect(fn);
+  _effect.run()
+}
+```
 
