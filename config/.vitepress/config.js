@@ -7,6 +7,7 @@ module.exports = {
   cacheDir: '../_cache/',
   srcDir: '../src',
   titleTemplate: ':title | GUANの博客',
+  ignoreDeadLinks: true,// 最好加上，构建时会忽略md中的外链
   head: [['link', { rel: 'ico', type: 'image/ico', href: '/favicon.ico' }]],
   vite: {
     define: {
