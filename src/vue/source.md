@@ -591,7 +591,7 @@ setTimeout(() => {
 
 
 
-##### effect - 收集副作用函数
+### effect - 收集副作用函数
 
 - 主要给传入的副作用函数 fn 进行 ReactiveEffect 包装一下
 - 将 fn 执行一遍
