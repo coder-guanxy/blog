@@ -1,9 +1,10 @@
 ---
 title: vue 源码之 reative | effect
 ---
-### vue source - reative | effect
+### reative | effect
 
-对 vue 进行极简分析，重点是快速掌握整个响应式流程。其他数据结构和其他 API，大致都是根据极简流程，做一些扩展，进行特殊处理。 
+对 vue 进行极简分析，重点是快速掌握整个响应式流程。
+其他数据结构和其他 API，大致都是根据极简流程，做一些扩展，进行特殊处理。 
 
 
 
@@ -11,8 +12,7 @@ title: vue 源码之 reative | effect
 
 - Set, Map, Array 等数据结构
 - shallowReactive, readonly, shallowReadonly 等 API
-
-
+- delete, has, ownKeys 操作
 
 ## 响应式核心 API - reative | effect
 
@@ -36,6 +36,7 @@ export function reactive(target: object) {
   )
 }
 ```
+<br/>
 
 #### createReactiveObject - 创建响应式对象
 
@@ -87,10 +88,7 @@ function createReactiveObject(
 }
 ```
 
-
-
 reactive 基本上就是相当于调用 Proxy 代理。主要的处理逻辑在 `mutableHandlers` 和 `collectionHandlers`
-
 
 
 简化代码：
@@ -119,11 +117,7 @@ export function reactive(target) {
 }
 ```
 
-
-
-
-
-
+<br/>
 
 ### mutableHandlers
 
@@ -204,15 +198,15 @@ function createGetter(isReadonly = false, shallow = false) {
 
 第一个操作很好理解，接下来我们看一下 **track 是如何将 target, key 和相关副作用进行绑定的**。
 
+<br/>
 
+##### track - 将 target 对象下面的 key 和相关副作用进行绑定
 
-#### track - 将 target 对象下面的 key 和相关副作用进行绑定
-
-**收集与 target 下面的 key 相关的 effect**
+- 收集与 target 下面的 key 相关的 effect
 
 先声明一个简单仓库用来存储 target, key 和副作用 dep 的关系。下面源码中有一句注释解释的就很好。
 
-```
+```ts
 // The main WeakMap that stores {target -> key -> dep} connections.
 const targetMap = new WeakMap<any, KeyToDepMap>()
 ```
@@ -234,7 +228,7 @@ track 函数的主要就是构建一个数据结构，然后调用 trackEffects 
 
   
 
-  ```js
+  ```ts
   [ // WeakMap 结构
   	target: 
     			[	// Map 结构
@@ -286,7 +280,7 @@ export const createDep = (effects?: ReactiveEffect[]): Dep => {
 
 
 
-#### trackEffects
+##### trackEffects
 
 主要的功能就是将 effect 放入到 dep 中
 
@@ -318,9 +312,9 @@ export function trackEffects(
 从 Get 这条收集副作用的线结束了，下面开始 Set 消费副作用的
 
 
+<br/>
 
-#### Set - 消费副作用
-
+#### Set - 找到并触发副作用
 
 
 - 从 target 上获取旧值和传入的新值触发 trigger
@@ -337,9 +331,9 @@ function createSetter(shallow = false) {
         let oldValue = (target as any)[key]
   			//...
         // 新值
-        const result = Reflect.set(target, key, value, receiver)
+        const result = Reflect.set(target, key, value, receiver);
         
-        trigger(target, TriggerOpTypes.SET, key, value, oldValue)
+        trigger(target, TriggerOpTypes.SET, key, value, oldValue);
     	
     		return result;
   	}
@@ -371,7 +365,8 @@ export function trigger(
   // 要处理其他情况，所以直接使用 deps。
   let deps: (Dep | undefined)[] = []
   
-  // 确保触发的 key 存在，depsMap.get(key) 获取的时一个 Set 结构，然后将 Set 结构放入到 deps 中
+  // 确保触发的 key 存在，
+  // depsMap.get(key) 获取的时一个 Set 结构，然后将 Set 结构放入到 deps 中
   // [new Set([effect1, effect2])]
   if (key !== void 0) {
       deps.push(depsMap.get(key))
@@ -518,7 +513,8 @@ function trigger(target, type, key, newValue, oldValue) {
   // 基于源码依然这样准备数据结构 - 简化后其实可以不用这种方式
   let deps
   
-  // key 不等于 undefined, 为什么使用 void 0 而不是使用 undefined, 因为 undefined 可以被赋值
+  // key 不等于 undefined, 
+  // 为什么使用 void 0 而不是使用 undefined, 因为 undefined 可以被赋值
   if (key !== void 0) {
      deps = depsMap.get(key)
   }
@@ -562,7 +558,7 @@ export const mutableHandlers = {
 
 举个例子：
 
-```
+```js
 import { reactive, effect } from "vue"
 
 const o = reactive({ data: 1 });
@@ -589,7 +585,7 @@ setTimeout(() => {
 - 找到缓存中 o 对象下面 data 属性相关的 effect 副作用函数
 - 重新执行一遍。
 
-
+<br/>
 
 ### effect - 收集副作用函数
 
@@ -615,7 +611,7 @@ export function effect(
 
 
 
-##### ReactiveEffect - 副作用的包装类
+#### ReactiveEffect - 副作用的包装类
 
 - 主要 run 函数，用来执行 fn
 - 将当前副作用实例赋值给全局变量 activeEffect，用于 track 收集
@@ -672,4 +668,10 @@ export function effect(fn){
   _effect.run()
 }
 ```
+
+## 总结：
+
+<br/>
+
+![流程图](../public/vue/reactive-effect.jpg)
 

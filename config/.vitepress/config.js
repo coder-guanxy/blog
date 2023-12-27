@@ -9,6 +9,10 @@ module.exports = {
   titleTemplate: ':title | GUANの博客',
   ignoreDeadLinks: true,// 最好加上，构建时会忽略md中的外链
   head: [['link', { rel: 'ico', type: 'image/ico', href: '/favicon.ico' }]],
+
+  markdown: {
+    lineNumbers: true,
+  },
   vite: {
     define: {
       _APP_VERSION__: JSON.stringify('v1.0.0'),
@@ -80,6 +84,21 @@ function generateSidebarBlogConfig() {
     }
   ];
 }
+
+function generateSidebarVueSouceConfig() {
+  return [
+    {
+      text: '快速开始',
+      items: [
+        { text: '初始化', link: '/vue/souce/effect' },
+        { text: '配置简介', link: '/blog/config' },
+        { text: '部署', link: '/blog/deploy' },
+        { text: '问题', link: '/blog/questions' }
+      ]
+    }
+  ];
+}
+
 
 // sidebar 配置
 function sidebarConfig() {
