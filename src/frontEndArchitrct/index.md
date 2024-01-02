@@ -1306,7 +1306,6 @@ this.interceptors.response.forEach(function puseResponseInterceptor(interceptor)
 while(chain.length) {
 	promise = promise.then(chain.shift(), chain.shift())
 }
-
 ```
 
 
@@ -1417,4 +1416,257 @@ function compose(...funcs){
 ```
 compose([fn1, fn2, fn3])(args) => fn1(fn2(fn3(args))) 
 ```
+
+
+
+### 软件开发的灵活性和定制性
+
+
+
+设计模式：23 种设计模式的本质是面向对象原则的实际运用，是对类的封装线，继承性和多态性，以及类的关联关系和组合关系的总结应用。
+
+
+
+##### 代理模式
+
+针对计算成本比较高的函数，可以通过对函数进行代理来缓存函数对应参数的计算返回结果。
+
+
+
+ES6 提供了 Proxy 代理
+
+
+
+##### 装饰者模式
+
+装饰者模式就是在不改变原对象的基础上，对对象进行包装和拓展，使原对象能够应对更加复杂的需求。
+
+
+
+### 函数思想
+
+
+
+纯函数：如果一个函数的输入参数确定，输出结果也是唯一确定的，那么它就是纯函数。
+
+高阶函数：接收一个函数作为参数，返回另一个函数。
+
+
+
+柯理化：把接收多个参数的函数变成接收一个单一参数（最初函数的第一个参数）的函数，并返回接收余下参数且返回结果的新函数的过程。
+
+反柯理化：利用第三方对象和上下文环境“强行改命，为我所用”
+
+- 将 Array.prototype.push 反 curry 化，实现了一个适用于对象的 push 方法。
+
+
+
+柯理化：
+
+```js
+function curry(fn) {
+		return (...args) => {
+				if(args.length === 0) {
+						return fn.call(this, ...args)
+				}
+				
+				return curry(fn.bind(this, ...args))		
+		}
+}
+```
+
+
+
+## 20 理解前端中的面向对象思想
+
+
+
+js 面向对象，它实质是基于原型的独享系统，而不是基于类的。
+
+
+
+#### new 关键字到底做了什么事情
+
+- 创建一个空对象
+- 将上面创建的对象的原型指向构造函数的 prototype 属性
+- 将空对象赋值给构造函数内容的 this，并执行构造函数逻辑
+- 根据构造函数的执行逻辑，返回第一步创建的对象或构造函数的显式返回值。
+
+
+
+```
+function newFunc(...args) {
+		const ctor = args.shift();
+		
+		const obj = Object.create(ctor.prototype);
+		
+		const result = ctor.apply(obj, args)
+		
+		return (typeof result === "object" && result !== null)? result: obj;
+}
+```
+
+
+
+构造函数如果有显式返回值且返回值为对象类型，那么构造函数的返回结果不再是目标实例。
+
+
+
+#### 如何优雅地实现继承
+
+
+
+```
+function inherit(Child, Parent) {
+		Child.prototype = Object.create(Parent.prototype);
+		
+		Child.prototype.constructor = Child;
+		
+		Child.super= Parent;
+		
+		Child.__proto__ = Parent;
+}
+```
+
+
+
+### 23 npm scripts: 打造一体化构建和部署流程
+
+
+
+#### npm  scripts 是什么？
+
+ npm 创造者允许开发者在 package.json 文件中通过 scripts 字段来自定义项目脚本。
+
+
+
+#### npm scripts 原理
+
+执行 npm scripts 的核心是 npm run。
+
+npm run 会自动创建一个 shell 脚本，npm scripts 脚本就在这个新创建的 shell 脚本中运行。
+
+shell 脚本：实际使用 Shell 脚本根据系统平台差异而有所不同，在类 UNIX 系统里使用的 /bin/sh，在 Windows 系统里使用的是 cmd.exe
+
+
+
+#### npm scripts 使用技巧
+
+- 在 npm scripts 中，可以使用 -- 标记参数。
+
+```json
+{
+  "scripts": "webpack --profile --json > stats.json"
+}
+```
+
+
+
+- 串行/并行执行脚本
+  - 串行 `$ npm run pre.js && npm run post.js`
+  - 并行`$ npm run A.js & npm run B.js`
+
+
+
+## 24 自动化代码检查：剖析 Lint 工具
+
+
+
+### 自动化 Lint 工具
+
+#### Prettier
+
+美化代码，格式化，规范化代码，使代码更加工整。
+
+
+
+目前支持：JS, JSX, Angular, Vue, Flow, TS, CSS(Less, Scss), JSON 等多种语言，框架数据交换格式，语法规范扩展。
+
+
+
+统一配置团队代码风格。
+
+
+
+Prettier 可以与编辑器结合，在开发者保存代码后立即进行美化，
+
+也可以集成到 CI 环境
+
+或者 Git 的 pre-commit 阶段来执行
+
+
+
+#### ESLint
+
+代码风格检查工具
+
+
+
+对于 JS 这种动态，宽松类型的语言来说，开发者更容易在编程中犯错。
+
+JS 不具备先天编译流程，往往会在运行时暴露错误。
+
+ESLint 允许开发者在执行前发现代码中错误或不合理的写法。
+
+
+
+.eslintrc 配置文件：
+
+- env - 启用环境
+- extends - 额外配置选项, 继承社区中成熟方案
+- plugin - 设置规则插件
+- parser - 默认 ESLint 使用 Espree 进行解析
+- parseOptions - 修改解析器，需要设置解析器的配置
+- rules - 定义扩展
+
+
+
+#### Prettier 和 ESLint
+
+
+
+- 格式化规则 - prettier
+
+比如：限制一行的最大长度，禁止使用空格和 Tab 混合缩进 等
+
+
+
+- 代码质量规则 - ESLint
+
+比如：声明了未使用变量，不必要的函数绑定 等代码书写规范
+
+这些规则对于代码质量和强健性至关重要
+
+
+
+#### husky 和 lint-staged
+
+Husky 就是 git 的一个钩子，在 git 进行到某一阶段时，可以将代码交给开发者完成某些特定的操作。
+
+比如：pre-commit, commit, push, 
+
+
+
+对整个项目代码进行检查会很慢，我们一般只想对修改的文件代码进行检查，此时就需要使用 lint-staged
+
+
+
+```json
+{
+  "scripts": {
+    "lint:write": "eslint --debug src/ --fix",
+    "prettier": "prettier --write src/**/*.js"
+  },
+  "husky": {
+    	"pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "**.{js | jsx}": ["npm run lint:write", "npm run prettier", "git add"]
+  }
+}
+```
+
+
+
+上述代码表示在 pre-commit 阶段对以 js 或 jsx 为后缀且修改的文件执行 ESLint 和 Prettier 操作，之后再进行 git add 命令将代码添加到暂存区。
 
