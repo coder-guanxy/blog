@@ -1,3 +1,6 @@
+import { genVueSouceSideBarConfig, genBlogSideBarConfig, genViteSideBarConfig, genReactSourceSideBarConfig  } from "./genSideBar"
+
+
 module.exports = {
   title: 'GUANの博客',
   description: 'vitepress & guan blog & GUANの博客',
@@ -12,6 +15,7 @@ module.exports = {
 
   markdown: {
     lineNumbers: true,
+    breaks: true,
   },
   vite: {
     define: {
@@ -44,9 +48,10 @@ module.exports = {
     },
     nav: navConfig(),
     sidebar: {
-      '/react/source': sidebarConfig(),
-      '/blog/': generateSidebarBlogConfig(),
-      "/tools/vite/": generateSidebarViteConfig()
+      '/react/source': genReactSourceSideBarConfig(),
+      '/vue/source/': genVueSouceSideBarConfig(),
+      '/blog/': genBlogSideBarConfig(),
+      "/tools/vite/": genViteSideBarConfig()
     },
     editLink: {
       pattern: 'https://github.com/coder-guanxy/blog/tree/main/src/:path',
@@ -54,64 +59,6 @@ module.exports = {
     }
   }
 };
-
-function generateSidebarViteConfig() {
-  return [
-    {
-      text: 'vite',
-      items: [
-        { text: '简介', link: '/tools/vite/guide' },
-        { text: '整体流程', link: '/tools/vite/process' },
-        { text: 'cli', link: '/tools/vite/cli' },
-        { text: '开发流程', link: '/tools/vite/dev' },
-        { text: 'HMR流程', link: '/tools/vite/hmr' },
-        { text: '打包流程', link: '/tools/vite/prod' },
-      ]
-    }
-  ]
-}
-
-function generateSidebarBlogConfig() {
-  return [
-    {
-      text: '快速开始',
-      items: [
-        { text: '初始化', link: '/blog/init' },
-        { text: '配置简介', link: '/blog/config' },
-        { text: '部署', link: '/blog/deploy' },
-        { text: '问题', link: '/blog/questions' }
-      ]
-    }
-  ];
-}
-
-function generateSidebarVueSouceConfig() {
-  return [
-    {
-      text: '快速开始',
-      items: [
-        { text: '初始化', link: '/vue/souce/effect' },
-        { text: '配置简介', link: '/blog/config' },
-        { text: '部署', link: '/blog/deploy' },
-        { text: '问题', link: '/blog/questions' }
-      ]
-    }
-  ];
-}
-
-
-// sidebar 配置
-function sidebarConfig() {
-  return [
-    {
-      text: 'Guide',
-      items: [
-        { text: 'Introduction', link: '/introduction' },
-        { text: 'Getting Started', link: '/getting-started' }
-      ]
-    }
-  ];
-}
 
 // nav 配置
 function navConfig() {
@@ -137,7 +84,7 @@ function navConfig() {
     {
       text: 'Vue',
       items: [
-        { text: 'Vue源码', link: '/vue/source' },
+        { text: 'Vue源码', link: '/vue/source/reactive-effect' },
         { text: 'Vue-Router', link: '/vue/router' },
         { text: 'Pinia', link: '/vue/pinia' }
       ]

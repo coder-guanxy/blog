@@ -673,5 +673,5 @@ export function effect(fn){
 
 <br/>
 
-![流程图](../public/vue/reactive-effect.jpg)
+![流程图](../../public/vue/reactive-effect.jpg)
 
