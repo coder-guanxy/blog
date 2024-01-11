@@ -10,24 +10,19 @@ effect 自定义 schedule 时执行流程：
 
 在执行 setter 时，如果存在自定义调度（schedule）函数
 ```js
-function triggerEffect(
-  effect: ReactiveEffect,
-  debuggerEventExtraInfo?: DebuggerEventExtraInfo
-) {
-  if (effect !== activeEffect || effect.allowRecurse) {
+    //...
     if (effect.scheduler) {
       effect.scheduler()
     } else {
       effect.run()
     }
-  }
-}
+    //...
 ```
 
 
 先通过下面示例说明一下 computed 的整个流程：
 
-首先说明一点 computed 相当于一个自定义 schedule 的 effect
+先说明一点 computed 相当于一个自定义 schedule 的 effect
 ```js
 effect(() => { // effect 入口 - ReactiveEffect - 1
     const rawObj = {a: 1, b: 2}
