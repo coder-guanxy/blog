@@ -1,4 +1,4 @@
-# diff
+# Diff
 
 大名鼎鼎的 diff 算法，就来自 `patchKeyedChildren` 这个函数。
 

@@ -7,7 +7,7 @@ export const genVueSouceSideBarConfig = () => {
             { text: 'reactvie-array', link: '/vue/source/reactive-array' },
             { text: 'computed', link: '/vue/source/computed' },
             { text: 'createApp', link: '/vue/source/createApp' },
-            { text: 'diff', link: '/vue/source/diff' },
+            { text: 'Diff', link: '/vue/source/diff' },
           ]
         }
       ]
