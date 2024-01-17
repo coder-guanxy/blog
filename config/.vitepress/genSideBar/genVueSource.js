@@ -8,6 +8,7 @@ export const genVueSouceSideBarConfig = () => {
             { text: 'computed', link: '/vue/source/computed' },
             { text: 'createApp', link: '/vue/source/createApp' },
             { text: 'Diff', link: '/vue/source/diff' },
+            { text: '组件的挂载和更新', link: '/vue/source/processComponent' },
           ]
         }
       ]

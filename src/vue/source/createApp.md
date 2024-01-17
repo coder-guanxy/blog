@@ -41,17 +41,7 @@ app.mount("#app");
 有上述 demo 可以看出，Vue 应用的入口是 createApp 函数。
 下面我们以 createApp 为切入点来看看 vue 的整个渲染流程。
 
-先看一下 createApp 的 TS 类型：
-
-```ts
-function createApp(rootComponent: Component, rootProps?: object): App
-```
-
-第一个参数是根组件。第二参数可选，它是要传递给根组件的 props。
-
 上面是[文档的说明](https://cn.vuejs.org/api/application.html#createapp)
-
-![createApp](../../public/vue/createApp.jpg)
 
 下面看一下 createApp 的源码：
 ## createApp 
@@ -358,7 +348,7 @@ export function createAppContext(): AppContext {
     slotScopeIds = null,
     optimized = __DEV__ && isHmrUpdating ? false : !!n2.dynamicChildren
   ) => {
-		// n1 = old
+    // n1 = old
     // n2 = new
     if (n1 === n2) {
       return
@@ -377,7 +367,7 @@ export function createAppContext(): AppContext {
       n2.dynamicChildren = null
     }
 
-		const { type, ref, shapeFlag } = n2
+    const { type, ref, shapeFlag } = n2
     switch (type) {
       case Text: // 文本节点 - 基础节点
         processText(n1, n2, container, anchor)
@@ -430,7 +420,7 @@ export function createAppContext(): AppContext {
             slotScopeIds,
             optimized
           )
-        } else if (shapeFlag & ShapeFlags.TELEPORT) { // teleport节点 - 组件节点
+        } else if (shapeFlag & ShapeFlags.TELEPORT) { // Teleport节点 - 组件节点
           ;(type as typeof TeleportImpl).process(
             n1 as TeleportVNode,
             n2 as TeleportVNode,
@@ -444,7 +434,7 @@ export function createAppContext(): AppContext {
             internals
           )
         } else if (__FEATURE_SUSPENSE__ && shapeFlag & ShapeFlags.SUSPENSE) { 
-          ;(type as typeof SuspenseImpl).process( // suspense节点 - 组件节点
+          ;(type as typeof SuspenseImpl).process( // Suspense节点 - 组件节点
             n1,
             n2,
             container,
@@ -462,3 +452,8 @@ export function createAppContext(): AppContext {
     }
 	}
 ```
+
+## 总结：
+整体的渲染流程大概如下：
+
+![createApp](../../public/vue/createApp.jpg)

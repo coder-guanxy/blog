@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "docs:dev": "vitepress dev config --port 3006",
+    "predocs:dev": "n 21.2.0",
+    "postdocs:dev": "n 12.18.1",
     "docs:build": "vitepress build config",
     "docs:preview": "vitepress preview config  --port 3008"
   },
