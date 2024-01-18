@@ -1,14 +1,31 @@
 # 组件的挂载和更新
 
 ## 组件是什么？
-组件就是一些元素的组合。
+<!-- 组件就是一些元素的组合。
 组件内部元素更新触发条件一般是由定时器或用户输入
 组件内部元素更新一般由内部状态或外部传入的 props 决定
 
 组件的更新和挂载，是 Vue 框架中最核心的功能。
 
 vue 的组件挂载或更新是从 processComponent 开始。
-下面我们来看一下 processComponent 函数。
+下面我们来看一下 processComponent 函数。 -->
+
+组件根据是否是第一次渲染，分为两种情况
+- 第一次渲染叫挂载流程
+- 之后渲染叫更新流程
+
+挂载流程中会执行挂载的钩子函数，也就是挂载的生命周期函数（beforeMount，mounted）
+更新流程同样会执行更新时的生命周期函数（beforeUpdate，updated）
+
+整个流程也解释了一些问题
+- effect 和组件渲染的关系？
+- 生命周期的运行时机？
+- setup 和 render 函数的关系？
+- 触发更新流程的条件有哪些？
+  - 一种是 `updateComponent`  - 父组件更新调用 props 更新
+  - 一种是 `setupRenderEffect` - 内部状态（data）的改变  
+
+整个流程最后会 patch 组件内部的元素，将其插入或移动到真实 DOM上。 
 
 ## 更新还是挂载（processComponent）
 
@@ -314,8 +331,9 @@ export function finishComponentSetup(
 
 ![setupRenderEffect](../../public/vue/effect-component.jpg)
 
-### 组件更新 - componentUpdateFn
+#### 组件更新 - componentUpdateFn
 
+挂载和更新的生命周期就是在此函数中触发的
 
 挂载阶段：
 1. 先执行 beforeMount 生命周期
@@ -436,7 +454,7 @@ u - updated
 
 两个阶段都调用 renderComponentRoot 也就是执行渲染函数，下面我们简单看一下都做了些什么
 
-### 执行 render 函数 - renderComponentRoot
+#### 执行 render 函数 - renderComponentRoot
 
 大致看一下主要是在 try...catch 中将 render 执行，然后将结果返回
 
