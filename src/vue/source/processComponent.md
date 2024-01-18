@@ -1,16 +1,20 @@
 # 组件的挂载和更新
 
-组件是元素的组合的一种抽象。
-组件在通过用户触发组件内元素的更新时（状态管理），有时需要执行一些程序（生命周期）
+## 组件是什么？
+组件就是一些元素的组合。
+组件内部元素更新触发条件一般是由定时器或用户输入
+组件内部元素更新一般由内部状态或外部传入的 props 决定
 
-组件的处理从 processComponent 开始，这个函数会根据以挂载或更新的方式处理组件，也是将组件。
+组件的更新和挂载，是 Vue 框架中最核心的功能。
+
+vue 的组件挂载或更新是从 processComponent 开始。
+下面我们来看一下 processComponent 函数。
 
 ## 更新还是挂载（processComponent）
 
 根据旧节点是否存在，作为更新和挂载的条件
 - 如果存在，进行更新 - updateComponent
 - 如果不存在，进行挂载 - mountComponent
-
 
 ```ts
   const processComponent = (
@@ -111,6 +115,8 @@ UI = effect(render(data))
 ```
 
 
+![挂载流程](../../public/vue/mountComponet.jpg)
+
 ### 执行 setup - setupComponent
 
 
@@ -162,7 +168,106 @@ export function setupComponent(
 
 ### 有状态组件的 setup 处理 - setupStatefulComponent
 
+```ts
+function setupStatefulComponent(
+  instance: ComponentInternalInstance,
+  isSSR: boolean
+) {
+  // 找到组件
+  const Component = instance.type as ComponentOptions
 
+
+  // 从组件中找到 setup 初始函数
+  const { setup } = Component
+
+  // 执行 setup
+  const setupResult = callWithErrorHandling(
+    setup,
+    instance,
+    ErrorCodes.SETUP_FUNCTION,
+    [instance.props, setupContext]
+  )
+
+  if (isPromise(setupResult)) {/**/}
+  else {
+    // 处理 setup 结果 - 将 setupResult 赋值到实例的 render 属性上
+    handleSetupResult(instance, setupResult, isSSR)
+  }
+}
+
+```
+
+#### 处理 setup 结果 - handleSetupResult
+
+处理 setupResult 不同的结果
+- 为函数，则直接赋值到 instance.render 属性上
+- 为对象，将结果赋值到 instance.setupState 上
+- 最后 finishComponentSetup 处理没有 render 函数的特殊情况
+
+```ts
+export function handleSetupResult(
+  instance: ComponentInternalInstance,
+  setupResult: unknown,
+  isSSR: boolean
+) {
+  if (isFunction(setupResult)) {
+    instance.render = setupResult as InternalRenderFunction
+  } else if (isObject(setupResult)) {
+    instance.setupState = proxyRefs(setupResult)
+  }
+
+  finishComponentSetup(instance, isSSR)
+}
+```
+
+#### 处理没有 render 的情况 - finishComponentSetup
+
+没有 render 函数的情况，找到
+
+```ts
+export function finishComponentSetup(
+  instance: ComponentInternalInstance,
+  isSSR: boolean,
+  skipOptions?: boolean
+) {
+  const Component = instance.type as ComponentOptions
+
+  if (!instance.render) {
+    
+    // 非 SSR && 有编译函数 && 没有 render 函数
+    if (!isSSR && compile && !Component.render) {
+
+      // 获取组件上的模板
+      const template = Component.template || resolveMergedOptions(instance).template
+
+      // 找到模板
+      if (template) {
+
+        // 编译模板的配置
+        const { isCustomElement, compilerOptions } = instance.appContext.config
+        const { delimiters, compilerOptions: componentCompilerOptions } =
+          Component
+        const finalCompilerOptions: CompilerOptions = extend(
+          extend(
+            {
+              isCustomElement,
+              delimiters
+            },
+            compilerOptions
+          ),
+          componentCompilerOptions
+        )
+
+        // 将编译好的渲染函数赋值到 Component.render 上
+        Component.render = compile(template, finalCompilerOptions)
+      }
+    }
+
+    // 最后赋值到组件实例上
+    instance.render = (Component.render || NOOP) as InternalRenderFunction
+  }
+}
+```
 
 
 ### 将 render 函数与 effect 结合 - setupRenderEffect
@@ -193,6 +298,7 @@ export function setupComponent(
     const effect = (instance.effect = new ReactiveEffect(
       componentUpdateFn,
       // 每次状态更新时，执行 scheduler，将 effect.run 放入到更新队列中
+      // queueJob 之后，分析 scheduler 时，再看
       () => queueJob(update), 
       instance.scope // 暂不分析
     ))
@@ -205,6 +311,8 @@ export function setupComponent(
     update()
   }
 ```
+
+![setupRenderEffect](../../public/vue/effect-component.jpg)
 
 ### 组件更新 - componentUpdateFn
 
@@ -323,6 +431,7 @@ u - updated
     }
 
 ```
+![componentUpdateFn](../../public/vue/mount|update.jpg)
 
 
 两个阶段都调用 renderComponentRoot 也就是执行渲染函数，下面我们简单看一下都做了些什么
