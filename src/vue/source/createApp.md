@@ -1,4 +1,6 @@
-# createApp - Vue 入口
+# 应用入口 - createApp
+
+从一个 DEMO 开始，了解 createApp 的作用。
 
 下面是 vue 一个应用简单 demo:
 ::: code-group
@@ -44,7 +46,7 @@ app.mount("#app");
 上面是[文档的说明](https://cn.vuejs.org/api/application.html#createapp)
 
 下面看一下 createApp 的源码：
-## createApp 
+## 整个应用的入口 - createApp 
 
 主要做了两件事：
 1. ensureRenderer - 主要固定 dom 操作（增删改查），将其作为参数传入
@@ -85,7 +87,7 @@ export const createApp = ((...args) => {
 ```
 
 
-### ensureRenderer
+### 将 DOM 操作传入 - ensureRenderer
 
 主要固定对平台操作方法 patchProp， nodeOps
 
@@ -126,7 +128,7 @@ export function createRenderer<
 
 ```
 
-### baseCreateRenderer 
+### 渲染核心方法 - baseCreateRenderer 
 
 baseCreateRenderer 是主要的渲染函数，大概有两千多行，也差不多是渲染的核心代码
 
@@ -147,7 +149,7 @@ function baseCreateRenderer(
 }
 ```
 
-### render
+### 开始渲染 - render
 
 主要调用 patch 构建虚拟树然后调用平台操作方法渲染到 container 上。
 
@@ -172,7 +174,7 @@ function baseCreateRenderer(
   }
 ```
 
-### createAppAPI
+### 渲染前的准备 - createAppAPI
 
 主要在渲染之前做一些准备工作
 
@@ -264,7 +266,7 @@ export function createAppContext(): AppContext {
 
 下面主要介绍一些 mount 挂载操作
 
-### mount
+### 挂载操作 - mount
 
 如果是第一次挂载，将根组件转为 VNode 节点，然后执行 render 渲染函数
 

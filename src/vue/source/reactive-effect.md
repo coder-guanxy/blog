@@ -1,12 +1,11 @@
 ---
 title: vue 源码之 reative | effect
 ---
-### reative | effect
+
+# 响应式简介
 
 对 vue 进行极简分析，重点是快速掌握整个响应式流程。
 其他数据结构和其他 API，大致都是根据极简流程，做一些扩展，进行特殊处理。 
-
-
 
 极简分析中不分析的部分：
 
@@ -14,12 +13,12 @@ title: vue 源码之 reative | effect
 - shallowReactive, readonly, shallowReadonly 等 API
 - delete, has, ownKeys 操作
 
-## 响应式核心 API - reative | effect
+ 响应式核心 API 一个是 reative， 另一个是 effect
+ 下面主要介绍这两个 API
 
-### reactive 
+## 响应式代理 - reactive 
 
 主要调用 `createReactiveObject` ，让 `createReactiveObject` 固定一些参数。
-
 
 ```ts
 // 缓存对象
@@ -38,7 +37,7 @@ export function reactive(target: object) {
 ```
 <br/>
 
-#### createReactiveObject - 创建响应式对象
+#### 创建响应式对象 - createReactiveObject
 
 主要调用 proxy 方法，直接代理 target，并绑定代理方法。
 
@@ -119,7 +118,7 @@ export function reactive(target) {
 
 <br/>
 
-### mutableHandlers
+### 拦截方法 - mutableHandlers
 
 首先看 mutableHandlers 都代理（拦截）了哪些操作。
 
@@ -587,7 +586,7 @@ setTimeout(() => {
 
 <br/>
 
-### effect - 收集副作用函数
+## 收集副作用函数 - effect
 
 - 主要给传入的副作用函数 fn 进行 ReactiveEffect 包装一下
 - 将 fn 执行一遍
