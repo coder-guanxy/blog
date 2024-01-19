@@ -9,6 +9,7 @@ export const genVueSouceSideBarConfig = () => {
             { text: '元素更新', link: '/vue/source/processElement' },
             { text: 'Diff算法', link: '/vue/source/diff' },
             { text: '传入函数执行处理', link: '/vue/source/callwithErrorHandler' },
+            { text: 'Scheduler', link: '/vue/source/scheduler' },
             { text: '虚拟DOM', link: '/vue/source/vnode' },
             { text: '计算属性原理 - computed', link: '/vue/source/computed' },
             { text: 'reactvie-array', link: '/vue/source/reactive-array' },

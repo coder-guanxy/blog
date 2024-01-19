@@ -293,7 +293,7 @@ export function finishComponentSetup(
 2. 每次执行 update 或 instance.update 时（根据父组件传入的 props 更新）
    - 执行 effect.run -> componentUpdateFn
 3. 当状态（data）更新时，（根据状态更新）
-   - 会自动执行 `() => queueJob(update)` 函数，把 update 加入队列
+   - 会自动执行`() => queueJob(update)` 函数，把 update 加入队列 -  [queueJob](./scheduler.md)将在 scheduler 中介绍
    - 下一个微任务执行中执行 update 函数，执行 effect.run -> componentUpdateFn
 
 ```ts
