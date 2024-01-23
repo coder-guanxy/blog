@@ -8,6 +8,7 @@ export const genVueSouceSideBarConfig = () => {
             { text: '组件的挂载和更新', link: '/vue/source/processComponent' },
             { text: '元素更新', link: '/vue/source/processElement' },
             { text: 'Diff算法', link: '/vue/source/diff' },
+            { text: '最长递增子序列', link: '/vue/source/longestIncreasingSubsequence' },
             { text: '传入函数执行处理', link: '/vue/source/callwithErrorHandler' },
             { text: 'Scheduler', link: '/vue/source/scheduler' },
             { text: '虚拟DOM', link: '/vue/source/vnode' },

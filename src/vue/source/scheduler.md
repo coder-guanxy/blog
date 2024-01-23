@@ -4,6 +4,11 @@
 
 下面我们就来介绍一下
 
+调度分三种：
+1. pre - 同步之前
+2. 同步调度 - 
+3. post - 下一个微任务执行 - mounted | updated
+
 首先定义三个存储队列以及一些
 ```ts
 // 任务队列
@@ -25,6 +30,7 @@ let currentFlushPromise: Promise<void> | null = null
 ## 任务加入到队列中 - queueJob
 
 - 传入的任务，不在任务队列中
+- 
 
 ```ts
 export function queueJob(job: SchedulerJob) {
@@ -41,10 +47,14 @@ export function queueJob(job: SchedulerJob) {
 
     // 
     if (job.id == null) {
+      // 加入到队列中
       queue.push(job)
     } else {
+      // 找到当前的 id，并插入到之后
       queue.splice(findInsertionIndex(job.id), 0, job)
     }
+
+    // 开始调用队列函数
     queueFlush()
   }
 }

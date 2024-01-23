@@ -486,7 +486,7 @@ export function renderComponentRoot(
       // runtime-compiled render functions using `with` block.
       const proxyToUse = withProxy || proxy
 
-      // 执行 render 函数
+      // 执行 render 函数，并执行结果转为 VNode
       result = normalizeVNode(
         render!.call(
           proxyToUse,
