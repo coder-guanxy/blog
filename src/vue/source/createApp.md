@@ -455,6 +455,16 @@ export function createAppContext(): AppContext {
 	}
 ```
 
+### 新旧节点是否一致 - isSameVNodeType
+
+- 看类型和 key 是否一致
+
+```ts
+function isSameVNodeType(n1: VNode, n2: VNode): boolean {
+  return n1.type === n2.type && n1.key === n2.key
+}
+```
+
 ## 总结：
 整体的渲染流程大概如下：
 

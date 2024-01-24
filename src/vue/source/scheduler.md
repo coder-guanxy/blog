@@ -27,7 +27,7 @@ let postFlushIndex = 0
 // 微任务 - Promise.resolve
 const resolvedPromise = /*#__PURE__*/ Promise.resolve() as Promise<any>
 
-// 当前正在执行的 flush 任务
+// 当前正在执行的 flush 任务， 为 nextTick 准备的
 let currentFlushPromise: Promise<void> | null = null
 ```
 
@@ -257,4 +257,23 @@ export function flushPreFlushCbs(
   }
 }
 
+```
+
+# nextTick
+
+内容很简单就是 `Promise.resolve().then(fn)` 下一个微任务执行 `fn`
+
+- 如果有任务 currentFlushPromise 会被赋值与任务队列的执行的 Promise，
+- 如果没有任务就执行 Promise.then 之后执行
+
+```ts
+export function nextTick<T = void>(
+  this: T,
+  fn?: (this: T) => void
+): Promise<void> {
+  // 等待执行任务完毕之后再继续执行 nextTick
+  // currentFlushPromise 会在 queueFlush 中赋值
+  const p = currentFlushPromise || resolvedPromise
+  return fn ? p.then(this ? fn.bind(this) : fn) : p
+}
 ```
