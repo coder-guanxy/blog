@@ -12,7 +12,8 @@ export const genVueSouceSideBarConfig = () => {
             { text: '传入函数执行处理', link: '/vue/source/callwithErrorHandler' },
             { text: 'Scheduler和nextTick', link: '/vue/source/scheduler' },
             { text: '虚拟DOM', link: '/vue/source/vnode' },
-            { text: '计算属性原理 - computed', link: '/vue/source/computed' },
+            { text: '计算属性原理', link: '/vue/source/computed' },
+            { text: 'watch', link: '/vue/source/watch' },
             { text: 'reactvie-array', link: '/vue/source/reactive-array' },
           ]
         }
