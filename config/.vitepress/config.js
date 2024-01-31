@@ -66,6 +66,14 @@ function navConfig() {
     { text: '导航', link: '/' },
     { text: '搭建博客', link: '/blog/init' },
     {
+      text: 'Vue',
+      items: [
+        { text: 'Vue源码', link: '/vue/source/reactive-effect' },
+        { text: 'Vue-Router', link: '/vue/router/createRouter' },
+        { text: 'Pinia', link: '/vue/pinia' }
+      ]
+    },
+    {
       text: '前端工程',
       items: [
         { text: 'vite', link: '/tools/vite/guide' },
@@ -81,13 +89,6 @@ function navConfig() {
         { text: 'Redux', link: '/react/redux' }
       ]
     },
-    {
-      text: 'Vue',
-      items: [
-        { text: 'Vue源码', link: '/vue/source/reactive-effect' },
-        { text: 'Vue-Router', link: '/vue/router' },
-        { text: 'Pinia', link: '/vue/pinia' }
-      ]
-    }
+
   ];
 }
