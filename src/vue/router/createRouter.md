@@ -260,22 +260,12 @@ export function createRouter(options: RouterOptions): Router {
 
 
   // 下面的都是一些函数，可以在使用时再看
-  function addRoute(){
-    //...
-  }
-
-  function removeRoute(name: RouteRecordName) {
-    //...
-  }
-
-  function hasRoute(name: RouteRecordName): boolean {
-    //...
-  }
-
-  function resolve(){
-    //...
-  }
-
+  // addRoute, removeRoute, hasRoute, resolve
+  // locationAsObject checkCanceledNavigation handleRedirectRecord 
+  // checkCanceledNavigationAndReject runWithContext triggerAfterEach
+  // setupListeners triggerError isReady handleScroll runGuardQueue
+  // 调用方法流程
+  // [push replace go] -> pushWithRedirect -> navigate -> finalizeNavigation
   //...
 
   const router: Router = {

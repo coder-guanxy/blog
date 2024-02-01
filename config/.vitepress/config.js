@@ -1,4 +1,10 @@
-import { genVueSouceSideBarConfig, genBlogSideBarConfig, genViteSideBarConfig, genReactSourceSideBarConfig  } from "./genSideBar"
+import {
+  genVueSourceSideBarConfig,
+  genVueRouterSideBarConfig,
+  genBlogSideBarConfig,
+  genViteSideBarConfig,
+  genReactSourceSideBarConfig
+} from "./genSideBar"
 
 
 module.exports = {
@@ -49,7 +55,8 @@ module.exports = {
     nav: navConfig(),
     sidebar: {
       '/react/source': genReactSourceSideBarConfig(),
-      '/vue/source/': genVueSouceSideBarConfig(),
+      '/vue/source/': genVueSourceSideBarConfig(),
+      '/vue/router/': genVueRouterSideBarConfig(),
       '/blog/': genBlogSideBarConfig(),
       "/tools/vite/": genViteSideBarConfig()
     },

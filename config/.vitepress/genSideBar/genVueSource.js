@@ -1,4 +1,4 @@
-export const genVueSouceSideBarConfig = () => {
+export const genVueSourceSideBarConfig = () => {
     return [
         {
           text: 'vue源码解析',
