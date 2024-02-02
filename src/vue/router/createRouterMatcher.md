@@ -182,12 +182,41 @@ export function normalizeRouteRecord(
 
 tokenizePath 函数是一个状态机，将一个字符串分解为不同的 token： 返回一个 token 数组
  会将 `path = "/user/:username"` 转化为
-```json
+```js
+[
   [
-    {type: TokenType.Static, value: "user"}, 
-    {type: TokenizerState.Param, value: "username"}
+      {
+          "type": "Static",
+          "value": "user"
+      }
+  ],
+  [
+      {
+          "type": "Param",
+          "value": "username",
+          "regexp": "",
+          "repeatable": false,
+          "optional": false
+      }
   ]
+]
 ```
+
+tokensToParser 会将上面的结果继续输出为
+
+```js
+{
+
+  "re": /^\/user\?$/i,
+  "score": [
+      []
+  ],
+  "keys": []
+  "parse": function(){},
+  "stringify": function(){},
+}
+```
+
 
 ```ts
 export function createRouteRecordMatcher(
@@ -196,17 +225,6 @@ export function createRouteRecordMatcher(
   options?: PathParserOptions
 ): RouteRecordMatcher {
   // tokenizePath 函数将 patch 进行 AST 解析 tokenizePath - > 返回一个 token 数组
-  // path = "/user/:username"
-  // tokenizePath => [
-  //  { type: TokenType.Static, value: "user"}, 
-  //  {type: TokenizerState.Param, value: "username"}]
-
-  //  /:orderId -> 仅匹配数字 { path: '/:orderId(\\d+)' },
-  // tokenizePath => [
-  //  {type: TokenizerState.Param, value: "orderId"}, 
-  //  {type: TokenizerState.ParamRegExp, customRe: "\\d+"}, 
-  //  {type: TokenizerState.ParamRegExpEnd, customRe: "\\d+"}, 
-  //  ]
   const parser = tokensToParser(tokenizePath(record.path), options)
 
   // 合并为一个 matcher 匹配器
@@ -229,3 +247,27 @@ export function createRouteRecordMatcher(
 }
 
 ```
+
+最终生成的 matcher 是一个对象，它包含以下属性：
+
+```js
+{
+
+  "re": /^\/user\?$/i,
+  "score": [
+      []
+  ],
+  "keys": []
+  "parse": function(){},
+  "stringify": function(){},
+  "record": {
+    "path": "/user/:username",
+  },
+  "parent",
+    // these needs to be populated by the parent
+  "children": [],
+  "alias": [],
+}
+```
+
+下面我们通过从 push 这个编程式的方法开始，逐步分析路由匹配的过程。
