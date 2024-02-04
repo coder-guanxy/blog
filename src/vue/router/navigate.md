@@ -285,3 +285,7 @@ export function extractComponentsGuards(
       .forEach(guard => runWithContext(() => guard(to, from, failure)))
   }
 ```
+
+## 总结一张图
+
+![navigate](../../public/vue/navigate.jpg)
