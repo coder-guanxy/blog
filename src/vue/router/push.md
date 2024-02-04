@@ -22,7 +22,7 @@ function replace(to: RouteLocationRaw) {
 2. 看是不是替换路由，处理替换路由
 3. 是否跳转到当前页面路由
 4. 正常跳转，调用 `navigate`
-5. 
+5. 最后调用 `finalizeNavigation` 也就是浏览器的 API 跳转
 
 参数：
 - to - 跳转的路由对象
@@ -131,6 +131,8 @@ function replace(to: RouteLocationRaw) {
             data
           )
         }
+
+        // 调用跳转后的守卫函数
         triggerAfterEach(
           toLocation as RouteLocationNormalizedLoaded,
           from,
@@ -288,5 +290,65 @@ function resolve(
 
 ```
 
+## 最终的导航 - finalizeNavigation
 
-## navigate - 
+主要调用： `routerHistory.replace` 或者 `routerHistory.push` 跳转
+这两个 API 详细请看[最终调用的函数](./h5.md)
+
+参数：
+- toLocation: 跳转路由
+- from - 当前路由
+- isPush - push 跳转标识
+- replace - replace 跳转标识
+- data - 跳转传递的数据
+
+```ts
+function finalizeNavigation(
+    toLocation: RouteLocationNormalizedLoaded,
+    from: RouteLocationNormalizedLoaded,
+    isPush: boolean,
+    replace?: boolean,
+    data?: HistoryState
+  ): NavigationFailure | void {
+    // 检测是否取消
+    const error = checkCanceledNavigation(toLocation, from)
+    if (error) return error
+
+    // 是不是第一条路由
+    const isFirstNavigation = from === START_LOCATION_NORMALIZED
+
+    // 跳转状态
+    const state: Partial<HistoryState> | null = !isBrowser ? {} : history.state
+
+    // push 标识
+    if (isPush) {
+      // 第一次跳转，或者是 replace 标识
+      if (replace || isFirstNavigation)
+        routerHistory.replace(
+          toLocation.fullPath,
+          assign(
+            {
+              scroll: isFirstNavigation && state && state.scroll,
+            },
+            data
+          )
+        )
+
+      // 否则 push 跳转
+      else routerHistory.push(toLocation.fullPath, data)
+    }
+
+    // 赋值当前路由 - ref - 更新
+    currentRoute.value = toLocation
+
+    // scroll 处理
+    handleScroll(toLocation, from, isPush, isFirstNavigation)
+
+    markAsReady()
+  }
+
+```
+
+## 总结一张图
+
+![push 流程](../../public/vue/pushprocess.jpg)

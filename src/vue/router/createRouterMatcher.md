@@ -148,7 +148,7 @@ export function createRouterMatcher(
 ```
 
 
-### 变准化 route 对象 - normalizeRouteRecord
+### 标准化 route 对象 - normalizeRouteRecord
 
 只是返回一个对象
 

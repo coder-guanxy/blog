@@ -3,6 +3,8 @@ title: vue-router
 ---
 # createRouter
 
+声明：版本为 4.2.5
+
 先看一下如何使用：
 [官网示例](https://router.vuejs.org/zh/guide/#JavaScript)
 
