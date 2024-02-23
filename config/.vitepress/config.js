@@ -3,7 +3,8 @@ import {
   genVueRouterSideBarConfig,
   genBlogSideBarConfig,
   genViteSideBarConfig,
-  genReactSourceSideBarConfig
+  genReactSourceSideBarConfig,
+  genMicroFrontEndSideBarConfig
 } from "./genSideBar"
 
 
@@ -58,7 +59,8 @@ module.exports = {
       '/vue/source/': genVueSourceSideBarConfig(),
       '/vue/router/': genVueRouterSideBarConfig(),
       '/blog/': genBlogSideBarConfig(),
-      "/tools/vite/": genViteSideBarConfig()
+      "/tools/vite/": genViteSideBarConfig(),
+      // "/microFrontEnd/": genMicroFrontEndSideBarConfig(),
     },
     editLink: {
       pattern: 'https://github.com/coder-guanxy/blog/tree/main/src/:path',
@@ -86,6 +88,15 @@ function navConfig() {
         { text: 'vite', link: '/tools/vite/guide' },
         // { text: 'webpack', link: '/tools/vite/webpack' },
         // { text: 'Babel', link: '/tools/vite/Babel' }
+      ]
+    },
+    {
+      text: '微前端',
+      items: [
+        { text: '简介', link: '/microFrontEnd/index' },
+        { text: 'micro-app', link: '/microFrontEnd/micro-app' },
+        { text: 'micro-app 常见问题', link: '/microFrontEnd/micro-app-question' },
+        { text: 'Redux', link: '/react/redux' }
       ]
     },
     {
