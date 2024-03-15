@@ -94,10 +94,11 @@ function navConfig() {
       text: '微前端',
       items: [
         { text: '简介', link: '/microFrontEnd/index' },
-        { text: 'micro-app', link: '/microFrontEnd/micro-app' },
-        { text: 'micro-app源码', link: '/microFrontEnd/micro-app/source/micro-app' },
-        { text: 'micro-app 常见问题', link: '/microFrontEnd/micro-app/micro-app-question' },
-        { text: 'Redux', link: '/react/redux' }
+        { text: 'micro-app', link: '/microFrontEnd/microApp' },
+        { text: 'micro-app源码', link: '/microFrontEnd/microApp/sourceMicroApp' },
+        { text: 'micro-app源码', link: '/microFrontEnd/microApp/sourceMicroAppDefineElement' },
+        { text: 'micro-app源码', link: '/microFrontEnd/microApp/sourceCreateAppInstance' },
+        { text: 'micro-app 常见问题', link: '/microFrontEnd/microApp/micro-app-question' },
       ]
     },
     {

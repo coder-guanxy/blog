@@ -20,3 +20,9 @@ React 组件是常规的 JavaScript 函数，但组件名称必须以大写字�
 ## JSX 是什么？
 
 JSX 是 JavaScript 的语法扩展，可以让你在 JavaScript 文件中书写类似 HTML 的标签
+
+
+
+## 渲染劫持
+
+高阶组件可以在 render 函数中做非常多的操作，从而控制原组件的渲染输出，只要改变了原组件的渲染，wo
