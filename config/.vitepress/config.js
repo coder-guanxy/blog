@@ -82,33 +82,33 @@ function navConfig() {
         { text: 'Pinia', link: '/vue/pinia' }
       ]
     },
-    {
-      text: '前端工程',
-      items: [
-        { text: 'vite', link: '/tools/vite/guide' },
-        // { text: 'webpack', link: '/tools/vite/webpack' },
-        // { text: 'Babel', link: '/tools/vite/Babel' }
-      ]
-    },
+    // {
+    //   text: '前端工程',
+    //   items: [
+    //     { text: 'vite', link: '/tools/vite/guide' },
+    //     // { text: 'webpack', link: '/tools/vite/webpack' },
+    //     // { text: 'Babel', link: '/tools/vite/Babel' }
+    //   ]
+    // },
     {
       text: '微前端',
       items: [
         { text: '简介', link: '/microFrontEnd/index' },
         { text: 'micro-app', link: '/microFrontEnd/microApp' },
-        { text: 'micro-app源码', link: '/microFrontEnd/microApp/sourceMicroApp' },
-        { text: 'micro-app源码', link: '/microFrontEnd/microApp/sourceMicroAppDefineElement' },
-        { text: 'micro-app源码', link: '/microFrontEnd/microApp/sourceCreateAppInstance' },
+        { text: '源码入口', link: '/microFrontEnd/microApp/sourceMicroApp' },
+        { text: '创建上下文实例', link: '/microFrontEnd/microApp/sourceCreateAppInstance' },
+        { text: '加载源码', link: '/microFrontEnd/microApp/sourceLoadSourceCode' },
         { text: 'micro-app 常见问题', link: '/microFrontEnd/microApp/micro-app-question' },
       ]
     },
-    {
-      text: 'React',
-      items: [
-        { text: 'React源码', link: '/react/source' },
-        { text: 'React-Router', link: '/react/router' },
-        { text: 'Redux', link: '/react/redux' }
-      ]
-    },
+    // {
+    //   text: 'React',
+    //   items: [
+    //     { text: 'React源码', link: '/react/source' },
+    //     { text: 'React-Router', link: '/react/router' },
+    //     { text: 'Redux', link: '/react/redux' }
+    //   ]
+    // },
 
   ];
 }
