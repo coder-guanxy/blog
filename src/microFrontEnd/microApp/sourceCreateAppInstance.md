@@ -83,3 +83,33 @@ export default class CreateApp implements AppInterface {
 }
 ```
 
+
+## loadSourceCode - 加载源码（script, link）
+
+主要 HTMLLoader 的单例模式，执行 run 方法
+
+```ts
+  // Load resources
+  public loadSourceCode(): void {
+    // 设置 app 状态 =》 当前为 loading 状态
+    this.setAppState(appStates.LOADING)
+
+    // HTMLLoader 单例模式，直接 run 方法
+    HTMLLoader.getInstance().run(this, extractSourceDom)
+  }
+```
+
+## createSandbox - 创建 iframe 沙箱和 with 沙箱
+
+根据不同的配置创建不同的沙箱
+
+```ts
+  // 创建 iframe 沙箱和 with 沙箱
+  private createSandbox (): void {
+    if (this.useSandbox && !this.sandBox) {
+      this.sandBox = this.iframe ? new IframeSandbox(this.name, this.url) : new WithSandBox(this.name, this.url)
+    }
+  }
+```
+
+接下来会用两篇分别介绍![如何处理源码](./sourceLoadSourceCode.md)和![创建沙箱](./sourceCreateSandbox.md)
