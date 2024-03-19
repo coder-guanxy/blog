@@ -60,7 +60,7 @@ module.exports = {
       '/vue/router/': genVueRouterSideBarConfig(),
       '/blog/': genBlogSideBarConfig(),
       "/tools/vite/": genViteSideBarConfig(),
-      "/microFrontEnd/source": genMicroFrontEndSideBarConfig(),
+      "/microFrontEnd/microApp": genMicroFrontEndSideBarConfig(),
     },
     editLink: {
       pattern: 'https://github.com/coder-guanxy/blog/tree/main/src/:path',
@@ -94,10 +94,11 @@ function navConfig() {
       text: '微前端',
       items: [
         { text: '简介', link: '/microFrontEnd/index' },
-        { text: 'micro-app', link: '/microFrontEnd/microApp' },
-        { text: '源码入口', link: '/microFrontEnd/microApp/sourceMicroApp' },
-        { text: '创建上下文实例', link: '/microFrontEnd/microApp/sourceCreateAppInstance' },
-        { text: '加载源码', link: '/microFrontEnd/microApp/sourceLoadSourceCode' },
+        // { text: 'micro-app', link: '/microFrontEnd/microApp' },
+        { text: 'micro-app 源码', link: '/microFrontEnd/microApp/sourceMicroApp' },
+        // { text: '创建上下文实例', link: '/microFrontEnd/microApp/sourceCreateAppInstance' },
+        // { text: '加载css, js源码', link: '/microFrontEnd/microApp/sourceLoadSourceCode' },
+        // { text: '处理 css 源码', link: '/microFrontEnd/microApp/sourceScopedCSS' },
         { text: 'micro-app 常见问题', link: '/microFrontEnd/microApp/micro-app-question' },
       ]
     },
