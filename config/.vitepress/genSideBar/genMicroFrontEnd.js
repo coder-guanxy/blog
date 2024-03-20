@@ -7,7 +7,7 @@ export const genMicroFrontEndSideBarConfig = () => {
             { text: '创建上下文实例', link: '/microFrontEnd/microApp/sourceCreateAppInstance' },
             { text: '加载css, js源码', link: '/microFrontEnd/microApp/sourceLoadSourceCode' },
             { text: '处理 css 源码', link: '/microFrontEnd/microApp/sourceScopedCSS' },
-            { text: 'iframe 沙箱', link: '/microFrontEnd/microApp/sourceCreateSandbox' },
+            { text: 'iframe 沙箱和虚拟路由', link: '/microFrontEnd/microApp/sourceCreateSandbox' },
           ]
         }
       ];
