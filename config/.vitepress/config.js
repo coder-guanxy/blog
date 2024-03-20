@@ -72,7 +72,7 @@ module.exports = {
 // nav 配置
 function navConfig() {
   return [
-    { text: '导航', link: '/' },
+    // { text: '导航', link: '/' },
     { text: '搭建博客', link: '/blog/init' },
     {
       text: 'Vue',
