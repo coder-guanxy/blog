@@ -352,6 +352,7 @@ export function extractLinkFromHtml (
 - 处理 exclude 属性， ignore 属性
 - 远程 script，将标签属性作为 appSpaceData 对象属性，存储起来，将链接存起来，并且存到全局上
 - 内联 script，比远程多一个将内联的内容赋值到 code 属性上
+- 非动态状态，将注释节点替换原有节点，执行 script 脚本
 
 ```ts
 // 提取 script 标签信息放入到 sourceCenter.script 中
@@ -472,7 +473,7 @@ export function extractScriptElement (
   if (isDynamic) {
     return { replaceComment }
   } else {
-    // 将注释节点替换原有节点
+    // 将注释节点替换原有节点，执行 script 脚本
     return parent?.replaceChild(replaceComment!, script)
   }
 }

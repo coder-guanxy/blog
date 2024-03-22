@@ -16,6 +16,12 @@ micro-app[name=xxx] .test {
 
 ```
 
+转换之前
+![css转换之前内容](../../public/microApp/csssource.jpg)
+
+转换之后
+![css转换之后内容](../../public/microApp/csstranfer.jpg)
+
 ## scopedCSS
 
 - 创建 CSSParser 实例

@@ -826,7 +826,11 @@ export function createMicroLocation (
   }
 ```
 
-有关 patchWindow， patchDocument， patchElement和 initStaticGlobalKeys 都是做一些代理的操作，可自行看
+
+## 更新流程相关
+
+有关 patchWindow， patchDocument， patchElement和 initStaticGlobalKeys 都是做一些代理的操作，可自行看。
+更新流程会用到这些内容：当用户点击子应用跳转子应用别的页面的时（更新），触发 iframe 子应用 url 更新，请求脚本并执行，执行时会调用 document, element 代理的方法，更新子应用中mirco-app-body 标签内容，然后展示出来
 
 ## 总结
 
